@@ -1,0 +1,263 @@
+/*
+Theme Name: SG Grid
+Template: sg-window
+Author: Cats_456
+Author URI: http://wpblogs.ru/themes/
+Theme URI: http://wpblogs.ru/themes/blog/theme/sg-grid/
+Description: This theme displays content in a Flexbox grid with 4, 3, 2 or 1 column. Right Sidebar layout can be changed to the left sidebar, both or full width layout. SG Grid has two full width widgetized areas at the top and bottom of website, it has footer with 3 columns, custom background and custom header, logo, 3 optional nav menus, Google fonts and other options in the customizer. SG Gris has a responsive design and can be used on mobile devices. Supported plugins: Jetpack's Portfolio and WooCommerce's Shop. Translation ready and translated in Russian. You can see the demo at http://wpblogs.info/demo/sggrid/ and documentation at http://wpblogs.ru/themes/how-to-video-sg-window-theme/.
+Version: 1.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: white, gray, green, black, blue, left-sidebar, right-sidebar, one-column, two-columns, three-columns, four-columns, fluid-layout, responsive-layout, custom-background, custom-header, flexible-header, full-width-template, custom-menu, featured-images, sticky-post, translation-ready, photoblogging, custom-colors, editor-style, theme-options, threaded-comments
+Text Domain: sg-grid
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+*/
+
+/* sidebars */
+
+.image-wrapper img {
+	width: 1680px;
+}
+
+#page .sidebar-footer .widget.sgwindow_page {
+	background: transparent;
+}
+
+.blog .default .content-container, 
+.archive .default .content-container {
+	margin-bottom: 20px;
+}
+
+#page .entry-meta {
+	margin: 0 auto;
+}
+
+#page .entry-meta a {
+	color: red;
+}
+
+.site .comments-area,
+.content,
+.nothing-found,
+.content-container,
+.entry-summary{
+	border-radius: 0;
+}
+
+#page  .widget.sgwindow_items_portfolio .element .entry-title,
+#page  .widget.sgwindow_items_portfolio .element .entrytitle,
+#page  .widget.sgwindow_items_category  .element .entry-title,
+#page  .widget.sgwindow_items_category .element .entrytitle {
+    background: transparent;
+}
+
+.default .entry-thumbnail img {
+	margin: 0;
+}
+
+/* Navigation */
+#page .previous-image,
+#page .next-image,
+#page .nav-link .nav-previous,
+#page .nav-previous-one,
+#page .nav-link .nav-next  {
+	font-weight: bold;
+	color: rgb(68,68,68);
+	text-decoration: none;
+	user-select: none;
+	padding: .2em 1.2em;
+	outline: none;
+	border: 1px solid rgba(0,0,0,.1);
+	border-radius: 2px;
+	background: rgb(245,245,245) linear-gradient(#f4f4f4, #f1f1f1);
+	box-shadow: none;
+	transition: all .218s ease 0s;
+}
+
+#page .previous-image:hover,
+#page .next-image:hover,
+#page .nav-link .nav-previous:hover,
+#page .nav-previous-one:hover,
+#page .nav-link .nav-next:hover {
+	color: rgb(24,24,24);
+	border: 1px solid rgb(198,198,198);
+	background: #f7f7f7 linear-gradient(#f7f7f7, #f1f1f1);
+	box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+
+#page .previous-image:active,
+#page .next-image:active,
+#page .nav-link .nav-previous:active,
+#page .nav-previous-one:active,
+#page .nav-link .nav-next:active {
+	color: rgb(24,24,24);
+	border: 1px solid rgb(198,198,198);
+	background: #f7f7f7 linear-gradient(#f7f7f7, #f1f1f1);
+	box-shadow: 0 1px 2px rgba(0,0,0,.1);
+}
+
+#page .widget.woocommerce.widget_product_search, #page  .wide .widget.widget_search {
+	background: rgba(255, 255, 255, 0.5);
+}
+
+#page .widget.sgwindow_page {
+  color: #666;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+#page .transparent  .site-content,
+#page .transparent  .content-container {
+	background: transparent;
+	border: none;
+}
+
+.sidebar-footer .widget.sgwindow_page .entry-title {
+  color: #000;
+}
+
+#page .column .widget.sgwindow_items_portfolio .entry-title, 
+#page .wide .widget.sgwindow_items_portfolio .entry-title, 
+#page .column .widget.sgwindow_items_category .entry-title,
+#page .wide .widget.sgwindow_items_category .entry-title {
+	color: #666;
+}
+
+#page .column .widget.sgwindow_items_portfolio .element:hover  .entry-title, 
+#page .wide .widget.sgwindow_items_portfolio .element:hover .entry-title, 
+#page .column .widget.sgwindow_items_category .element:hover .entry-title,
+#page .wide .widget.sgwindow_items_category .element:hover  .entry-title {
+	color: #fff;
+}
+
+#page .column .widget.sgwindow_product .element, 
+#page .column .widget.sgwindow_items_portfolio .element, 
+#page .column .widget.sgwindow_items_category .element, 
+#page .column .widget.sgwindow_items .element {
+	border: 1px solid #eee;
+}
+
+#page .wide .widget.sgwindow_product .element, 
+#page .wide .widget.sgwindow_items_portfolio .element, 
+#page .wide .widget.sgwindow_items_category .element, 
+#page .wide .widget.sgwindow_items .element {
+	border: 1px solid #eee;
+}
+
+.sidebar-before-footer.wide,
+.sidebar-footer {
+	border-top: 1px solid #aaa;
+}
+
+
+#page .project a:before {
+	color: blue;
+}
+
+#page .comment-metadata, 
+#page .comment-author.vcard {
+	display: block;
+}
+
+#page .comment-metadata {
+	padding: 0 50px;
+}
+
+.search .content-container article,
+.archive .content-container article,
+.blog .content-container article {
+	padding: 5px;
+}
+
+.search .content-container article .entry-content,
+.search .content-container article .entry-title,
+.archive .content-container article .entry-content,
+.archive .content-container article .entry-title,
+.blog .content-container article .entry-content,
+.blog .content-container article .entry-title {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+.flex .archive .content-container article .entry-content,
+.flex .blog .content-container article .entry-summary {
+	font-size: 12px;
+}
+
+#page .entry-thumbnail.coverback {
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	padding: 35% 0;
+}
+
+#page .content-container {
+	border: none;
+}
+
+.sidebar-top {
+	border: none !important;
+}
+
+.woo-shop.flex-layout-4 .products li {
+	border: none !important;
+	border-radius: 0;
+}
+
+#page .wide .widget.sgwindow_recent_shop .product-price, 
+#page .wide .widget.sgwindow_product .product-price, 
+#page .wide .widget.sgwindow_featured_products .product-price {
+	background: rgba( 255, 255, 255, 0.5 );
+}
+
+@media screen and (min-width: 680px) {	
+
+	#page .wide .flex-layout-1 .content-container {
+			width: 94%;
+	}
+
+	#page .flex-layout-1 .content-container {
+			width: 100%;
+	}
+		
+	#page .flex-layout-2 .content-container {
+			width: 50%;
+	}
+
+	#page .flex-layout-3 .content-container {
+			width: 33.3333%;
+	}
+
+	#page .flex-layout-4 .content-container {
+			width: 25%;
+	}
+}
+
+/* sg widnow */
+
+.two-sidebars .widget .site-content {
+	width: 100%;
+}
+
+.left-sidebar .widget .site-content {
+	width: 100%;
+}
+
+#page .column .widget.sgwindow_page .content-container,
+.right-sidebar .widget .site-content {
+	margin: 0;
+	width: 100%;
+}	
+
+.right-sidebar .widget .widget-page-wrap  {
+}
+
+#page .column .widget.sgwindow_page .widget-page-wrap,
+#page .column .widget.sgwindow_page .main-wrapper,
+#page .column .widget.sgwindow_page {
+	margin-top: 0;
+	padding: 0;
+}
