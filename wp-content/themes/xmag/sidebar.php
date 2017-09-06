@@ -7,7 +7,7 @@
  */
 ?>
 
-<div id="secondary" class="sidebar widget-area" role="complementary">
+<div id="secondary" class="sidebar widget-area  <?php xmag_widget_style(); ?>" role="complementary">
 
 	<?php if ( has_nav_menu( 'social_navigation' ) ) {
 		wp_nav_menu(

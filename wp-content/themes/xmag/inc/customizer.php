@@ -58,23 +58,76 @@ function xmag_theme_customizer( $wp_customize ) {
 	$wp_customize->get_setting( 'blogname' )->transport         = 'postMessage';
 	$wp_customize->get_setting( 'blogdescription' )->transport  = 'postMessage';
 	$wp_customize->get_setting( 'header_textcolor' )->transport = 'postMessage';
-	// Move Background Color Control to 'xmag_layout_section'
-	$wp_customize->get_control( 'background_color' )->section = 'xmag_layout_section';
-	// Add Callback Function to Background Color
-	$wp_customize->get_control( 'background_color' )->active_callback = 'xmag_has_boxed_layout';
-	// Add Callback Function to Background Section
-	$wp_customize->get_section( 'background_image' )->active_callback = 'xmag_has_boxed_layout';
-		
+
 	// Theme Settings
 	$wp_customize->add_panel( 'xmag_panel', array(
     	'title' => __( 'Theme Settings', 'xmag' ),
 		'priority' => 10,
 	) );
 	
+	// General Section
+	$wp_customize->add_section( 'xmag_general_section', array(
+		'title'       => __( 'General', 'xmag' ),
+		'priority'    => 10,
+		'panel' => 'xmag_panel',
+		'description'	=> __( 'General Settings.', 'xmag' ),
+	) );
+	
+	// Layout Style
+	$wp_customize->add_setting( 'xmag_layout_style', array(
+        'default' => 'site-fullwidth',
+        'type' => 'option',
+		'capability' => 'edit_theme_options',
+        'sanitize_callback' => 'xmag_sanitize_choices',
+    ) );
+   	   	
+	$wp_customize->add_control( 'xmag_layout_style', array(
+	    'label'    => __( 'Layout Style', 'xmag' ),
+	    'section'  => 'xmag_general_section',
+	    'settings' => 'xmag_layout_style',
+	    'priority' => 1,
+	    'type'     => 'select',
+		'choices'  => array(
+			'site-fullwidth' => __('Full Width', 'xmag'),
+			'site-boxed' => __('Boxed', 'xmag'),
+			),
+	) );
+	
+	// Widgets Style
+	$wp_customize->add_setting( 'xmag_widget_style', array(
+        'default' => 'grey',
+        'sanitize_callback' => 'xmag_sanitize_choices',
+    ) );
+   	   	
+	$wp_customize->add_control( 'xmag_widget_style', array(
+	    'label'    => __( 'Widgets Style', 'xmag' ),
+	    'section'  => 'xmag_general_section',
+	    'settings' => 'xmag_widget_style',
+	    'type'     => 'select',
+		'choices'  => array(
+			'grey' => __('Grey', 'xmag'),
+			'white' => __('White', 'xmag'),
+			'minimal' => __('Minimal', 'xmag'),
+			),
+	) );
+	
+	// Read More
+	$wp_customize->add_setting( 'xmag_read_more', array(
+        'default' => '',
+        'sanitize_callback' => 'xmag_sanitize_checkbox',
+    ) );
+   	
+	$wp_customize->add_control( 'xmag_read_more', array(
+	    'label'    => __( 'Display Read More Link', 'xmag' ),
+	    'section'  => 'xmag_general_section',
+	    'settings' => 'xmag_read_more',
+	    'type'     => 'checkbox',
+	) );
+	
 	// Header Section
 	$wp_customize->add_section( 'xmag_header_section', array(
 		'title'       => __( 'Header', 'xmag' ),
-		'priority'    => 10,
+		'priority'    => 15,
 		'panel' => 'xmag_panel',
 	) );
 	
@@ -88,7 +141,7 @@ function xmag_theme_customizer( $wp_customize ) {
 	    'label'    => __( 'Main Menu Style', 'xmag' ),
 	    'section'  => 'xmag_header_section',
 	    'settings' => 'xmag_menu_style',
-	    'type'     => 'radio',
+	    'type'     => 'select',
 		'choices'  => array(
 			'dark' => __('Dark', 'xmag'),
 			'light' => __('Light', 'xmag'),
@@ -131,7 +184,7 @@ function xmag_theme_customizer( $wp_customize ) {
     ) );
    	
 	$wp_customize->add_control( 'xmag_home_icon', array(
-	    'label'    => __( 'Show the Home icon in the Main Menu', 'xmag' ),
+	    'label'    => __( 'Display the Home icon in the Main Menu', 'xmag' ),
 	    'section'  => 'xmag_header_section',
 	    'settings' => 'xmag_home_icon',
 	    'type'     => 'checkbox',
@@ -144,81 +197,65 @@ function xmag_theme_customizer( $wp_customize ) {
     ) );
    	
 	$wp_customize->add_control( 'xmag_show_search', array(
-	    'label'    => __( 'Show Search Form', 'xmag' ),
+	    'label'    => __( 'Display Search Form in the Top Menu', 'xmag' ),
 	    'section'  => 'xmag_header_section',
 	    'settings' => 'xmag_show_search',
 	    'type'     => 'checkbox',
 	) );
 	
-	// Header Image Height
+	// Header Image Custom Width
+	$wp_customize->add_setting( 'xmag_header_image_width', array(
+        'default' => 1920,
+        'sanitize_callback' => 'absint',
+    ) );
+	
+	$wp_customize->add_control( 'xmag_header_image_width', array(
+	    'label'    => __( 'Header Image', 'xmag' ),
+	    'description' => __( 'Width (If you change the size you have to add a new image)', 'xmag' ),
+	    'section'  => 'xmag_header_section',
+	    'settings' => 'xmag_header_image_width',
+	    'type'     => 'number',
+	) );
+	
+	// Header Image Custom Height
 	$wp_customize->add_setting( 'xmag_header_image_height', array(
         'default' => 360,
-        'sanitize_callback' => 'xmag_sanitize_integer',
+        'sanitize_callback' => 'absint',
     ) );
 	
 	$wp_customize->add_control( 'xmag_header_image_height', array(
-	    'label'    => __( 'Header Image', 'xmag' ),
-	    'description' => __( 'Custom Header Image Height. If you change the height you have to add a new image.', 'xmag' ),
+	    'description' => __( 'Height (If you change the size you have to add a new image)', 'xmag' ),
 	    'section'  => 'xmag_header_section',
 	    'settings' => 'xmag_header_image_height',
 	    'type'     => 'number',
 	) );
 	
-	// Header Image
+	// Display Header Image on Mobile
+	$wp_customize->add_setting( 'show_header_image', array(
+        'default' => '',
+        'sanitize_callback' => 'xmag_sanitize_checkbox',
+    ) );
+   	
+	$wp_customize->add_control( 'show_header_image', array(
+	    'label'    => __( 'Display Header Image on Mobile', 'xmag' ),
+	    'section'  => 'xmag_header_section',
+	    'settings' => 'show_header_image',
+	    'type'     => 'checkbox',
+	) );
+	
+	// Display Header Image on Front Page only
 	$wp_customize->add_setting( 'xmag_show_header_image', array(
         'default' => 1,
         'sanitize_callback' => 'xmag_sanitize_checkbox',
     ) );
    	
 	$wp_customize->add_control( 'xmag_show_header_image', array(
-	    'label'    => __( 'Show Header Image on Front Page Only', 'xmag' ),
+	    'label'    => __( 'Display Header Image on Front Page Only', 'xmag' ),
 	    'section'  => 'xmag_header_section',
 	    'settings' => 'xmag_show_header_image',
 	    'type'     => 'checkbox',
 	) );
-	
-	// General Section
-	$wp_customize->add_section( 'xmag_general_section', array(
-		'title'       => __( 'General', 'xmag' ),
-		'priority'    => 15,
-		'panel' => 'xmag_panel',
-		'description'	=> __( 'General Settings.', 'xmag' ),
-	) );
-	
-	// Layout Style
-	$wp_customize->add_setting( 'xmag_layout_style', array(
-        'default' => 'site-fullwidth',
-        'type' => 'option',
-		'capability' => 'edit_theme_options',
-        'sanitize_callback' => 'xmag_sanitize_choices',
-    ) );
-   	   	
-	$wp_customize->add_control( 'xmag_layout_style', array(
-	    'label'    => __( 'Layout Style', 'xmag' ),
-	    'description' => __( 'Choose between Full width or Boxed Layout. If you select Boxed Layout option, you can edit Background Settings.', 'xmag' ),
-	    'section'  => 'xmag_general_section',
-	    'settings' => 'xmag_layout_style',
-	    'priority' => 1,
-	    'type'     => 'select',
-		'choices'  => array(
-			'site-fullwidth' => __('Full Width', 'xmag'),
-			'site-boxed' => __('Boxed', 'xmag'),
-			),
-	) );
-	
-	// Read More
-	$wp_customize->add_setting( 'xmag_read_more', array(
-        'default' => '',
-        'sanitize_callback' => 'xmag_sanitize_checkbox',
-    ) );
-   	
-	$wp_customize->add_control( 'xmag_read_more', array(
-	    'label'    => __( 'Show Read More Link', 'xmag' ),
-	    'section'  => 'xmag_general_section',
-	    'settings' => 'xmag_read_more',
-	    'type'     => 'checkbox',
-	) );
-		
+
 	// Blog Section
 	$wp_customize->add_section( 'xmag_blog_section', array(
 		'title'       => __( 'Blog', 'xmag' ),
@@ -249,7 +286,7 @@ function xmag_theme_customizer( $wp_customize ) {
 	// Blog Excerpt Length
 	$wp_customize->add_setting( 'xmag_excerpt_size', array(
         'default' => 25,
-        'sanitize_callback' => 'xmag_sanitize_integer',
+        'sanitize_callback' => 'absint',
     ) );
 	
 	$wp_customize->add_control( 'xmag_excerpt_size', array(
@@ -288,7 +325,7 @@ function xmag_theme_customizer( $wp_customize ) {
 	// Archive Excerpt Length
 	$wp_customize->add_setting( 'xmag_archive_excerpt_size', array(
         'default' => 25,
-        'sanitize_callback' => 'xmag_sanitize_integer',
+        'sanitize_callback' => 'absint',
     ) );
 	
 	$wp_customize->add_control( 'xmag_archive_excerpt_size', array(
@@ -312,7 +349,7 @@ function xmag_theme_customizer( $wp_customize ) {
     ) );
    	
 	$wp_customize->add_control( 'xmag_post_featured_image', array(
-	    'label'    => __( 'Show Featured Image', 'xmag' ),
+	    'label'    => __( 'Display Featured Image', 'xmag' ),
 	    'section'  => 'xmag_post_section',
 	    'settings' => 'xmag_post_featured_image',
 	    'type'     => 'checkbox',
@@ -350,7 +387,7 @@ function xmag_theme_customizer( $wp_customize ) {
     ) );
    	
 	$wp_customize->add_control( 'xmag_page_featured_image', array(
-	    'label'    => __( 'Show Featured Image', 'xmag' ),
+	    'label'    => __( 'Display Featured Image', 'xmag' ),
 	    'section'  => 'xmag_page_section',
 	    'settings' => 'xmag_page_featured_image',
 	    'type'     => 'checkbox',
@@ -388,7 +425,7 @@ function xmag_theme_customizer( $wp_customize ) {
     ) );
    	
 	$wp_customize->add_control( 'xmag_scroll_up', array(
-	    'label'    => __( 'Show Scroll Up button', 'xmag' ),
+	    'label'    => __( 'Display Scroll Up button', 'xmag' ),
 	    'section'  => 'xmag_footer_section',
 	    'settings' => 'xmag_scroll_up',
 	    'type'     => 'checkbox',
@@ -402,7 +439,7 @@ function xmag_theme_customizer( $wp_customize ) {
 
    $wp_customize->add_setting('xmag_links', array(
       'capability' => 'edit_theme_options',
-      'sanitize_callback' => 'xmag_links_sanitize',
+      'sanitize_callback' => 'esc_url_raw',
    ) );
 
    $wp_customize->add_control(new DL_Important_Links($wp_customize, 'xmag_links', array(
@@ -496,7 +533,7 @@ function xmag_sanitize_text( $input ) {
 
 
 /**
- * Strips all of the HTML in the content
+ * Strips all of the HTML in the content.
  *
  */ 
 function xmag_nohtml_sanitize( $input ) {
@@ -505,25 +542,7 @@ function xmag_nohtml_sanitize( $input ) {
 
 
 /**
- * Sanitize xMag Links
- *
- */ 
-function xmag_links_sanitize() {
-	return false;
-}
-
-
-/**
- * Sanitize Numbers
- *
- */
-function xmag_sanitize_integer( $input ) {
-	return intval( $input );
-}
-
-
-/**
- * Checks Main Menu Style
+ * Checks Main Menu Style.
  */
 function xmag_has_custom_menu( $control ) {
     if ( $control->manager->get_setting('xmag_menu_style')->value() == 'custom' ) {
@@ -535,19 +554,7 @@ function xmag_has_custom_menu( $control ) {
 
 
 /**
- * Checks Layout Style
- */
-function xmag_has_boxed_layout( $control ) {
-    if ( $control->manager->get_setting('xmag_layout_style')->value() == 'site-boxed' ) {
-		return true;
-    } else {
-        return false;
-    }
-}
-
-
-/**
- * Checks if Post has Featured Image
+ * Checks if Post has Featured Image.
  */
 function xmag_post_has_featured_image( $control ) {
     if ( $control->manager->get_setting('xmag_post_featured_image')->value() == 1 ) {
@@ -559,7 +566,7 @@ function xmag_post_has_featured_image( $control ) {
 
 
 /**
- * Checks is Page has Featured Image
+ * Checks is Page has Featured Image.
  */
 function xmag_page_has_featured_image( $control ) {
     if ( $control->manager->get_setting('xmag_page_featured_image')->value() == 1 ) {
@@ -600,7 +607,11 @@ function xmag_custom_style() {
 	$main_menu_style = get_theme_mod('xmag_menu_style');
 	
 	$custom_style = "";
-			
+	
+	if ( get_theme_mod( 'show_header_image' ) ) {
+		$custom_style .= ".header-image {display: block;}";
+	}
+		
 	// Accent Color
 	if ( $accent_color != '' ) {
 		$custom_style .= "
@@ -626,20 +637,12 @@ function xmag_custom_style() {
 		if ( xmag_get_brightness($accent_color) > 150) {
 	    	$custom_style .= "
 			.entry-meta .category a, .featured-image .category a,
+			button, input[type='button'], input[type='reset'], input[type='submit'],
 			#scroll-up, .search-submit, .large-post .more-link {
 			color: rgba(0,0,0,.7);
 			} 
 			.entry-meta .category a:before {
 			background-color: rgba(0,0,0,.7);
-			}";
-	    } else {
-	    	$custom_style .= "
-			.entry-meta .category a, .featured-image .category a,
-			#scroll-up, .search-submit, .large-post .more-link {
-			color: #fff;
-			}
-			.entry-meta .category a:before {
-			background-color: #fff;
 			}";
 	    }
 	} // if $accent_color
@@ -751,48 +754,26 @@ function xmag_custom_style() {
 		}";
 		if ( xmag_get_brightness($main_menu_background) > 150) {
 			$custom_style .= "
-			.main-menu > li > a,
-			.main-menu ul a,
-			.main-navigation .home-link a,
-			#mobile-header .mobile-title, 
-			#mobile-header .mobile-menu-toggle {
-			color: rgba(0,0,0,.8);
+			.main-menu > li > a, .main-menu ul a, .home-link a,
+			#mobile-header .mobile-title, #mobile-header .mobile-menu-toggle {
+			color: rgba(0,0,0,.9);
 			}
-			.main-menu > li a:hover,
+			.home-link a:hover, .main-menu > li > a:hover,
+			.main-menu > li.current-menu-item > a, .main-menu > li.current_page_item > a {
+			color: rgba(0,0,0,0.6);
+			}
 			.main-menu ul a:hover,
-			.home-link a:hover {
-			color: rgba(0,0,0,0.9);
+			.main-menu ul .current-menu-item a,
+			.main-menu ul .current_page_item a {
+			color: rgba(0,0,0,.9);
+			background-color: rgba(0,0,0,.05);
 			}
 			.mobile-header a {
 			color: rgba(0,0,0,.9);
 			}
-			.button-toggle,
-			.button-toggle:before,
-			.button-toggle:after {
-			background-color: rgba(0,0,0,.8);
+			.button-toggle, .button-toggle:before, .button-toggle:after {
+			background-color: rgba(0,0,0,.9);
 			} ";
-		} else {	
-			$custom_style .= "
-			.main-menu > li > a,
-			.main-menu ul a,
-			.home-link a,
-			#mobile-header .mobile-title, 
-			#mobile-header .mobile-menu-toggle {
-			color: #fff;
-			}
-			.main-menu > li > a:hover,
-			.main-menu ul a:hover,
-			.home-link a:hover {
-			color: rgba(255,255,255,0.9);
-			}
-			.mobile-header a {
-			color: #fff;
-			}
-			.button-toggle,
-			.button-toggle:before,
-			.button-toggle:after {
-			background-color: #fff;
-			}";
 		}
 	} // if $main_menu_background
 	

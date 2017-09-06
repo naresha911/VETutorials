@@ -32,7 +32,7 @@
 		$clone_top_nav.find( '.sub-posts' ).remove();
 		$clone_top_nav = $clone_top_nav.removeAttr('id').removeClass('top-menu').addClass('mobile-menu');
 		
-		$mobile_nav.append( $clone_main_nav, $( '<hr>' ), $clone_top_nav );
+		$mobile_nav.append( $clone_main_nav, $clone_top_nav );
 
 	} );
 })( jQuery, window , document );

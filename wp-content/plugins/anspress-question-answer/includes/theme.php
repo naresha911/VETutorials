@@ -3,12 +3,10 @@
  * AnsPress theme and template handling.
  *
  * @author    Rahul Aryan <support@anspress.io>
- * @license   GPL-2.0+
- *
+ * @license   GPL-3.0+
  * @link      https://anspress.io
- *
  * @copyright 2014 Rahul Aryan
- * @package AnsPress/theme
+ * @package   WordPress/AnsPress
  */
 
 // If this file is called directly, abort.
@@ -18,6 +16,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Return current page title.
+ *
  * @return string current title
  */
 function ap_page_title() {
@@ -28,21 +27,17 @@ function ap_page_title() {
 
 	if ( is_question() ) {
 		if ( ! ap_user_can_read_question( get_question_id() ) ) {
-			$new_title = __('No permission', 'anspress-question-answer' );
+			$new_title = __( 'No permission', 'anspress-question-answer' );
 		} else {
 			$new_title = ap_question_title_with_solved_prefix();
 		}
-	} elseif ( is_ap_edit() ) {
-		$new_title = __( 'Edit post', 'anspress-question-answer' );
 	} elseif ( is_ap_search() ) {
 		$new_title = sprintf( ap_opt( 'search_page_title' ), sanitize_text_field( get_query_var( 'ap_s' ) ) );
 	} elseif ( is_ask() ) {
 		$new_title = ap_opt( 'ask_page_title' );
-	} elseif ( is_ap_users() ) {
-		$new_title = ap_opt( 'users_page_title' );
-	} elseif ( '' == $current_page && ! is_question() && '' == get_query_var( 'question_name' ) ) {
+	} elseif ( '' === $current_page && ! is_question() && '' === get_query_var( 'question_name' ) ) {
 		$new_title = ap_opt( 'base_page_title' );
-	} elseif ( get_query_var( 'parent' ) != '' ) {
+	} elseif ( get_query_var( 'parent' ) !== '' ) {
 		$new_title = sprintf( __( 'Discussion on "%s"', 'anspress-question-answer' ), get_the_title( get_query_var( 'parent' ) ) );
 	} elseif ( isset( $pages[ $current_page ]['title'] ) ) {
 		$new_title = $pages[ $current_page ]['title'];
@@ -56,59 +51,12 @@ function ap_page_title() {
 }
 
 /**
- * Get current answer or question id is being edited
- * @return integer|false
- */
-function ap_edit_post_id() {
-	if ( is_anspress() && get_query_var( 'edit_post_id' ) ) {
-		return get_query_var( 'edit_post_id' );
-	}
-
-	return false;
-}
-
-/**
- * Check if current page is edit page
- * @return boolean
- */
-function is_ap_edit() {
-	if ( is_anspress() && get_query_var( 'edit_post_id' ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Check if current page is revision page
- * @return boolean
- */
-function is_ap_revision() {
-	if ( is_anspress() && get_query_var( 'ap_page' ) == 'revision' ) {
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Check if current page is AnsPress search page
+ * Check if current page is search page
+ *
  * @return boolean
  */
 function is_ap_search() {
-	if ( is_anspress() && get_query_var( 'ap_page' ) == 'search' ) {
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Check if current user page is followers page
- * @return boolean
- */
-function is_ap_followers() {
-	if ( is_ap_user() && get_query_var( 'user_page' ) == 'followers' ) {
+	if ( is_anspress() && get_query_var( 'ap_s' ) ) {
 		return true;
 	}
 
@@ -117,6 +65,7 @@ function is_ap_followers() {
 
 /**
  * Return current AnsPress page
+ *
  * @return string|false
  */
 function ap_current_page_is() {
@@ -133,10 +82,6 @@ function ap_current_page_is() {
 			$template = 'edit-question';
 		} elseif ( is_answer_edit() ) {
 			$template = 'edit-answer';
-		} elseif ( is_ap_users() ) {
-			$template = 'users';
-		} elseif ( is_ap_user() ) {
-			$template = 'user';
 		} elseif ( is_ap_search() ) {
 			$template = 'search';
 		} elseif ( is_ap_revision() ) {
@@ -155,13 +100,14 @@ function ap_current_page_is() {
 
 /**
  * Get current user page template file
+ *
  * @return string template file name.
  */
 function ap_get_current_page_template() {
 	if ( is_anspress() ) {
 		$template = ap_current_page_is();
 
-		return apply_filters( 'ap_current_page_template', $template.'.php' );
+		return apply_filters( 'ap_current_page_template', $template . '.php' );
 	}
 
 	return 'content-none.php';
@@ -169,11 +115,12 @@ function ap_get_current_page_template() {
 
 /**
  * Get post status.
+ *
  * @param boolean|integer $post_id question or answer ID.
  * @return string
  * @since 2.0.0-alpha2
  */
-function ap_post_status($post_id = false) {
+function ap_post_status( $post_id = false ) {
 	if ( false === $post_id ) {
 		$post_id = get_the_ID();
 	}
@@ -183,11 +130,12 @@ function ap_post_status($post_id = false) {
 
 /**
  * Check if current post is private.
+ *
  * @param boolean|integer $post_id question or answer ID.
  * @return boolean
  */
-function is_private_post($post_id = false) {
-	if ( ap_post_status( $post_id ) == 'private_post' ) {
+function is_private_post( $post_id = false ) {
+	if ( ap_post_status( $post_id ) === 'private_post' ) {
 		return true;
 	}
 
@@ -196,11 +144,12 @@ function is_private_post($post_id = false) {
 
 /**
  * Check if post is waiting moderation.
+ *
  * @param boolean|integer $post_id question or answer ID.
  * @return bool
  */
-function is_post_waiting_moderation($post_id = false) {
-	if ( get_post_status( $post_id ) == 'moderate' ) {
+function is_post_waiting_moderation( $post_id = false ) {
+	if ( get_post_status( $post_id ) === 'moderate' ) {
 		return true;
 	}
 
@@ -209,12 +158,13 @@ function is_post_waiting_moderation($post_id = false) {
 
 /**
  * Check if question is closed.
+ *
  * @param boolean|integer $post_id question or answer ID.
  * @return boolean
  * @since 2.0.0-alpha2
  */
-function is_post_closed($post_id = false) {
-	if ( get_post_status( $post_id ) == 'closed' ) {
+function is_post_closed( $post_id = null ) {
+	if ( ap_get_post_field( 'closed', $post_id ) ) {
 		return true;
 	}
 
@@ -223,19 +173,20 @@ function is_post_closed($post_id = false) {
 
 /**
  * Check if question have a parent post.
+ *
  * @param boolean|integer $post_id question or answer ID.
  * @return boolean
  * @since   2.0.0-alpha2
  */
-function ap_have_parent_post($post_id = false) {
+function ap_have_parent_post( $post_id = false ) {
 	if ( ! $post_id ) {
 		$post_id = get_the_ID();
 	}
 
 	// Get post.
-	$post_o = get_post( $post_id );
+	$post_o = ap_get_post( $post_id );
 
-	if ( $post_o->post_parent > 0 && 'question' == $post_o->post_type ) {
+	if ( $post_o->post_parent > 0 && 'question' === $post_o->post_type ) {
 		return true;
 	}
 
@@ -249,10 +200,10 @@ function ap_have_parent_post($post_id = false) {
  * @param float  $current Current paged, if not set then get_query_var('paged') is used.
  * @param int    $total   Total number of pages, if not set then global $questions is used.
  * @param string $format  pagination format.
- *
+ * @param string $page_num_link  Base link.
  * @return string
  */
-function ap_pagination($current = false, $total = false, $format = '?paged=%#%') {
+function ap_pagination( $current = false, $total = false, $format = '?paged=%#%', $page_num_link = false ) {
 	global $ap_max_num_pages, $ap_current, $questions;
 
 	if ( is_front_page() ) {
@@ -262,7 +213,7 @@ function ap_pagination($current = false, $total = false, $format = '?paged=%#%')
 	$big = 999999999; // Need an unlikely integer.
 
 	if ( false === $current ) {
-	    $paged = isset( $_GET['ap_paged'] ) ? (int) $_GET['ap_paged'] : 1;
+	    $paged = ap_sanitize_unslash( 'ap_paged', 'r', 1 );
 	    $current = is_front_page() ? max( 1, $paged ) : max( 1, get_query_var( 'paged' ) );
 	} elseif ( ! empty( $ap_current ) ) {
 	    $current = $ap_current;
@@ -274,7 +225,9 @@ function ap_pagination($current = false, $total = false, $format = '?paged=%#%')
 		$total = $questions->max_num_pages;
 	}
 
-	$page_num_link = str_replace( array( '&amp;', '&#038;' ), '&', get_pagenum_link( $big ) );
+	if ( false === $page_num_link ) {
+		$page_num_link = str_replace( array( '&amp;', '&#038;' ), '&', get_pagenum_link( $big ) );
+	}
 
 	if ( is_front_page() ) {
 		$base = add_query_arg( array( 'ap_paged' => '%#%' ), home_url( '/' ) );
@@ -282,125 +235,20 @@ function ap_pagination($current = false, $total = false, $format = '?paged=%#%')
 		$base = str_replace( $big, '%#%', $page_num_link );
 	}
 
-	if ( '1' == $total ) {
+	if ( '1' == $total ) { // WPCS: loose comparison ok.
 		return;
 	}
 
 	echo '<div class="ap-pagination clearfix">';
-	echo paginate_links(array(
-		'base' => $base,
-		'format' => $format,
-		'current' => $current,
-		'total' => $total,
+	echo paginate_links( array( // WPCS: xss okay.
+		'base'     => $base,
+		'format'   => $format,
+		'current'  => $current,
+		'total'    => $total,
 		'end_size' => 3,
 		'mid_size' => 3,
-	));
+	) );
 	echo '</div>';
-}
-
-/**
- * Question meta to display.
- *
- * @param false|integer $question_id question id.
- * @return string
- * @since 2.0.1
- */
-function ap_display_question_metas($question_id = false) {
-	if ( false === $question_id ) {
-		$question_id = get_the_ID();
-	}
-
-	$metas = array();
-	if ( ! is_question() ) {
-		if ( ap_question_best_answer_selected() ) {
-			$metas['solved'] = '<span class="ap-best-answer-label ap-tip" title="'.__( 'answer accepted', 'anspress-question-answer' ).'">'.__( 'Solved', 'anspress-question-answer' ).'</span>';
-		}
-
-		$view_count = ap_get_qa_views();
-		$metas['views'] = '<i>' . sprintf( __( '%d views', 'anspress-question-answer' ), $view_count ) . '</i>';
-		$metas['history'] = ap_latest_post_activity_html( $question_id, ! is_question() );
-	}
-
-	// If featured question.
-	if ( ap_is_featured_question( $question_id ) ) {
-		$metas['featured'] = __( 'Featured', 'anspress-question-answer' );
-	}
-
-	/*
-     * FILTER: ap_display_question_meta
-     * Used to filter question display meta
-	 */
-	$metas = apply_filters( 'ap_display_question_metas', $metas, $question_id );
-
-	$output = '';
-	if ( ! empty( $metas ) && is_array( $metas ) ) {
-		foreach ( $metas as $meta => $display ) {
-			$output .= "<span class='ap-display-meta-item {$meta}'>{$display}</span>";
-		}
-	}
-
-	return $output;
-}
-
-/**
- * Return font icons class of AnsPress.
- * All font icons should be called using this function so that it can be overridden.
- * @param string $name Name or class of font icon.
- * @param bool   $html return icon class wrapped by i tag.
- * @return string
- * @since 2.0.1
- */
-function ap_icon($name, $html = false) {
-	$icons = array(
-		'follow' 			=> 'apicon-plus',
-		'unfollow' 			=> 'apicon-minus',
-		'upload' 			=> 'apicon-upload',
-		'unchecked' 		=> 'apicon-checkbox-unchecked',
-		'checked' 			=> 'apicon-checkbox-checked',
-		'check' 			=> 'apicon-check',
-		'select' 			=> 'apicon-check',
-		'new_question' 		=> 'apicon-question',
-		'new_answer' 		=> 'apicon-answer',
-		'new_comment' 		=> 'apicon-talk-chat',
-		'new_comment_answer' => 'apicon-mail-reply',
-		'edit_question' 	=> 'apicon-pencil',
-		'edit_answer' 		=> 'apicon-pencil',
-		'edit_comment' 		=> 'apicon-pencil',
-		'vote_up' 			=> 'apicon-thumb-up',
-		'vote_down' 		=> 'apicon-thumb-down',
-		'favorite' 			=> 'apicon-heart',
-		'delete' 			=> 'apicon-trashcan',
-		'edit' 				=> 'apicon-pencil',
-		'comment' 			=> 'apicon-comments',
-		'view' 				=> 'apicon-eye',
-		'vote' 				=> 'apicon-triangle-up',
-		'cross' 			=> 'apicon-x',
-		'more' 				=> 'apicon-ellipsis',
-		'upload' 			=> 'apicon-cloud-upload',
-		'link' 				=> 'apicon-link',
-		'help' 				=> 'apicon-question',
-		'error' 			=> 'apicon-x',
-		'warning' 			=> 'apicon-alert',
-		'success' 			=> 'apicon-check',
-		'image' 			=> 'apicon-image',
-	);
-
-	$icons = apply_filters( 'ap_icon', $icons );
-	$icon = '';
-
-	if ( isset( $icons[ $name ] ) ) {
-		$icon = $icons[ $name ];
-	} else {
-		$icon = 'apicon-'.$name;
-	}
-
-	$icon = esc_attr( $icon ); // Escape attribute.
-
-	if ( $html ) {
-		return '<i class="'.$icon.'"></i> ';
-	}
-
-	return $icon;
 }
 
 /**
@@ -410,28 +258,31 @@ function ap_icon($name, $html = false) {
  * @param string   $page_title   Page title.
  * @param callable $func         Hook to run when shortcode is found.
  * @param bool     $show_in_menu User can add this pages to their WordPress menu from appearance->menu->AnsPress.
+ * @param bool     $private Only show to currently logged in user?
  *
  * @since 2.0.1
  */
-function ap_register_page($page_slug, $page_title, $func, $show_in_menu = true) {
+function ap_register_page( $page_slug, $page_title, $func, $show_in_menu = true, $private = false ) {
 	anspress()->pages[ $page_slug ] = array(
-		'title' 		=> $page_title,
-		'func' 			=> $func,
-		'show_in_menu' 	=> $show_in_menu,
+		'title' 		     => $page_title,
+		'func' 			     => $func,
+		'show_in_menu' 	 => $show_in_menu,
+		'private' 	     => $private,
 	);
 }
 
 /**
  * Output current AnsPress page.
- * @since 2.0.0-beta
+ *
+ * @since 2.0.0
  */
 function ap_page() {
 	$pages = anspress()->pages;
 	$current_page = ap_current_page();
 
 	if ( is_question() ) {
-		$current_page = ap_opt( 'question_page_slug' );
-	} elseif ( '' == $current_page && ! is_question() ) {
+		$current_page = 'question';
+	} elseif ( '' === $current_page && ! is_question() ) {
 		$current_page = 'base';
 	}
 
@@ -447,120 +298,141 @@ function ap_page() {
 
 /**
  * Return post actions array.
- * @return array|boolean
+ *
+ * @param mixed $_post Post.
+ * @return array
  * @since  3.0.0
  */
-function ap_post_actions() {
-	global $post;
+function ap_post_actions( $_post = null ) {
+	$_post = ap_get_post( $_post );
 
-	if ( ! $post->post_type == 'question' || ! $post->post_type == 'answer' ) {
-		return;
-	}
+	$actions = [];
 
-	$actions = array();
-
-	// Select answer button.
-	if ( $post->post_type == 'answer' ) {
-	    $actions['select_answer'] = ap_select_answer_btn_html( $post->ID );
-	}
-
-	// Comment button.
-	// if ( ap_user_can_comment( $post->ID ) ) {
-	    $actions['comment'] = ap_comment_btn_html();
-	// }
-	$actions['status'] = ap_post_change_status_btn_html( $post->ID );
-
-	// Edit question link.
-	if ( ap_user_can_edit_question( $post->ID ) && $post->post_type == 'question' ) {
-	    $actions['dropdown']['edit_question'] = ap_edit_post_link_html();
-	}
-
-	// Edit answer link.
-	if ( ap_user_can_edit_answer( $post->ID ) && $post->post_type == 'answer' ) {
-		$actions['dropdown']['edit_answer'] = ap_edit_post_link_html();
-	}
-
-	// Flag link.
-	if ( is_user_logged_in() ) {
-		$actions['dropdown']['flag'] = ap_flag_btn_html();
+	if ( ! in_array( $_post->post_type, [ 'question', 'answer' ], true ) ) {
+		return $actions;
 	}
 
 	// Featured link.
-	if ( is_super_admin() && $post->post_type == 'question' ) {
-		$actions['dropdown']['featured'] = ap_featured_post_btn( $post->ID );
+	if ( 'question' === $_post->post_type ) {
+		$actions[] = ap_featured_post_args( $_post->ID );
 	}
 
-	// Delete link.
-	if ( ap_user_can_delete_post( $post->ID ) && $post->post_status != 'trash' ) {
-		$actions['dropdown']['delete'] = ap_post_delete_btn_html();
+	// Question close action.
+	if ( ap_user_can_close_question() && 'question' === $_post->post_type ) {
+		$nonce = wp_create_nonce( 'close_' . $_post->ID );
+		$close_label = $_post->closed ?  __( 'Open', 'anspress-question-answer' ) : __( 'Close', 'anspress-question-answer' );
+		$close_title = $_post->closed ?  __( 'Open this question for new answers', 'anspress-question-answer' ) : __( 'Close this question for new answer.', 'anspress-question-answer' );
+
+		$actions[] = array(
+			'cb' => 'close',
+			'icon'  => 'apicon-check',
+			'query' => [ 'nonce' => $nonce, 'post_id' => $_post->ID ],
+			'label' => $close_label,
+			'title' => $close_title,
+		);
 	}
 
-	if ( ap_user_can_delete_post( $post->ID ) && $post->post_status == 'trash' ) {
-		$actions['dropdown']['restore'] = ap_post_restore_btn_html();
+	// Edit link.
+	if ( ap_user_can_edit_post( $_post->ID ) ) {
+		$actions[] = array(
+			'cb' => 'edit',
+			'label' => __( 'Edit', 'anspress-question-answer' ),
+			'href'  => ap_post_edit_link( $_post ),
+		);
+	}
+
+	// Flag link.
+	$actions[] = ap_flag_btn_args( $_post );
+
+	$status_args = ap_post_status_btn_args( $_post );
+
+	if ( ! empty( $status_args ) ) {
+		$actions[] = array(
+			'label'  => __( 'Status', 'anspress-question-answer' ),
+			'header' => true,
+		);
+
+		$actions = array_merge( $actions, $status_args );
+		$actions[] = array( 'header' => true );
+	}
+
+	if ( ap_user_can_delete_post( $_post->ID ) ) {
+
+		if ( 'trash' === $_post->post_status ) {
+			$label = __( 'Undelete', 'anspress-question-answer' );
+			$title = __( 'Restore this post', 'anspress-question-answer' );
+		} else {
+			$label = __( 'Delete', 'anspress-question-answer' );
+			$title = __( 'Delete this post (can be restored again)', 'anspress-question-answer' );
+		}
+
+		$actions[] = array(
+			'cb'    => 'toggle_delete_post',
+			'query' => [ 'post_id' => $_post->ID, '__nonce' => wp_create_nonce( 'trash_post_' . $_post->ID ) ],
+			'label' => $label,
+			'title' => $title,
+		);
 	}
 
 	// Permanent delete link.
-	if ( ap_user_can_delete_post( $post->ID ) ) {
-		$actions['dropdown']['permanent_delete'] = ap_post_permanent_delete_btn_html();
+	if ( ap_user_can_permanent_delete( $_post->ID ) ) {
+		$actions[] = array(
+			'cb'    => 'delete_permanently',
+			'query' => [ 'post_id' => $_post->ID, '__nonce' => wp_create_nonce( 'delete_post_' . $_post->ID ) ],
+			'label' => __( 'Delete Permanently', 'anspress-question-answer' ),
+			'title' => __( 'Delete post permanently (cannot be restored again)', 'anspress-question-answer' ),
+		);
 	}
 
 	// Convert question to a post.
-	if ( is_super_admin( ) && 'question' === $post->post_type ) {
-		$nonce = wp_create_nonce( 'ap_ajax_nonce' );
-		$actions['dropdown']['convert_to_post'] = '<a href="#" data-action="ajax_btn" data-query="convert_to_post::'.$nonce.'::'. $post->ID .'">'.__('Convert to post', 'anspress-question-answer' ).'</a>';
+	if ( ( is_super_admin( ) || current_user_can( 'manage_options' ) ) && 'question' === $_post->post_type ) {
+
+		$actions[] = array(
+			'cb'    => 'convert_to_post',
+			'query' => [ 'post_id' => $_post->ID, '__nonce' => wp_create_nonce( 'convert-post-' . $_post->ID ) ],
+			'label' => __( 'Convert to post', 'anspress-question-answer' ),
+			'title' => __( 'Convert this question to blog post', 'anspress-question-answer' ),
+		);
 	}
 
-	/*
-     * FILTER: ap_post_actions_buttons
-     * For filtering post actions buttons
-     * @var     string
-     * @since   2.0
+	/**
+	 * FILTER: ap_post_actions_buttons
+	 * For filtering post actions buttons
+	 *
+	 * @var     string
+	 * @since   2.0
 	 */
-	return apply_filters( 'ap_post_actions_buttons', $actions );
+	$actions = apply_filters( 'ap_post_actions', array_filter( $actions ) );
+	return array_values( $actions );
 }
 
 /**
  * Post actions buttons.
  *
- * @param array $disable pass item to hide.
- * @return string
  * @since 	2.0
  */
-function ap_post_actions_buttons($disable = array()) {
-	global $post;
-	$actions = ap_post_actions();
+function ap_post_actions_buttons() {
 
-	if ( ! empty( $actions ) && count( $actions ) > 0 ) {
-		echo '<ul id="ap_post_actions_'. esc_attr($post->ID ) .'" class="ap-q-actions ap-ul-inline clearfix">';
-		foreach ( (array) $actions as $k => $action ) {
-			if ( ! empty( $action ) && 'dropdown' != $k && ! in_array( $k, $disable ) ) {
-				echo '<li class="ap-post-action ap-action-'.esc_attr($k ).'">'.$action.'</li>';
-			}
-		}
-
-		if ( ! empty( $actions['dropdown'] ) ) {
-			echo '<li class="ap-post-action dropdown">';
-			echo '<div id="ap_post_action_'.esc_attr($post->ID ).'" class="ap-dropdown">';
-			echo '<a class="apicon-ellipsis more-actions ap-tip ap-dropdown-toggle" title="'.__( 'More action', 'anspress-question-answer' ).'" href="#" data-query="post_actions_dp::'. wp_create_nonce( 'ap_ajax_nonce' ) .'::'. esc_attr($post->ID ) .'" data-action="ajax_btn"></a>';
-			echo '</div>';
-			echo '</li>';
-		}
-
-		echo '</ul>';
+	if ( ! is_user_logged_in() ) {
+		return;
 	}
+
+	$args = wp_json_encode( [
+		'post_id' => get_the_ID(),
+		'nonce'   => wp_create_nonce( 'post-actions-' . get_the_ID() ),
+	]);
+
+	echo '<post-actions class="ap-dropdown"><button class="ap-btn apicon-dots ap-actions-handle ap-dropdown-toggle" ap="actiontoggle" ap-query="' . esc_js( $args ) . '"></button><ul class="ap-actions ap-dropdown-menu"></ul></post-actions>';
 }
 
 /**
- * Return all shorting types for questions.
+ * Return all order by options for questions list.
+ *
  * @param  string $current_url Current page URL.
  * @return array
  * @since  3.0.0 Moved from `ap_question_sorting()`.
  */
-function ap_get_question_sorting( $current_url = '' ) {
-	if ( is_home() || is_front_page() ) {
-		$current_url = home_url( '/' );
-	}
-
+function ap_get_questions_orderby( $current_url = '' ) {
 	$param = array();
 	$search_q = get_query_var( 'ap_s' );
 
@@ -568,38 +440,25 @@ function ap_get_question_sorting( $current_url = '' ) {
 		$param['ap_s'] = $search_q;
 	}
 
-	$link = add_query_arg( $param, $current_url );
-
 	$navs = array(
-		[ 'key' => 'active','title' => __( 'Active', 'anspress-question-answer' ) ],
-		[ 'key' => 'newest', 'title' => __( 'Newest', 'anspress-question-answer' ) ],
+		[ 'key' => 'order_by', 'value' => 'active', 'label' => __( 'Active', 'anspress-question-answer' ) ],
+		[ 'key' => 'order_by', 'value' => 'newest', 'label' => __( 'Newest', 'anspress-question-answer' ) ],
 	);
 
 	if ( ! ap_opt( 'disable_voting_on_question' ) ) {
-		$navs[] = [ 'key' => 'voted', 'title' => __( 'Voted', 'anspress-question-answer' ) ];
+		$navs[] = [ 'key' => 'order_by', 'value' => 'voted', 'label' => __( 'Voted', 'anspress-question-answer' ) ];
 	}
 
-	$navs[] = [ 'key' => 'answers','title' => __( 'Answered', 'anspress-question-answer' ) ];
-	$navs[] = [ 'key' => 'unanswered', 'title' => __( 'Unanswered', 'anspress-question-answer' ) ];
-	$navs[] = [ 'key' => 'unsolved', 'title' => __( 'Unsolved', 'anspress-question-answer' ) ];
-	$navs[] = [ 'key' => 'views', 'title' => __( 'Views', 'anspress-question-answer' ) ];
+	$navs[] = [ 'key' => 'order_by', 'value' => 'answers','label' => __( 'Answered', 'anspress-question-answer' ) ];
+	$navs[] = [ 'key' => 'order_by', 'value' => 'unanswered', 'label' => __( 'Unanswered', 'anspress-question-answer' ) ];
+	$navs[] = [ 'key' => 'order_by', 'value' => 'unsolved', 'label' => __( 'Unsolved', 'anspress-question-answer' ) ];
+	$navs[] = [ 'key' => 'order_by', 'value' => 'views', 'label' => __( 'Views', 'anspress-question-answer' ) ];
 
-	$active_sort = 'active';
-	if ( isset($_GET['ap_filter'], $_GET['ap_filter']['sort'] ) ) {
-		$active_sort = wp_unslash( $_GET['ap_filter']['sort'] );
-	}
-
-	// Add active.
-	foreach ( (array) $navs as $k => $nav ) {
-		if ( $nav['key'] == $active_sort ) {
-			$navs[ $k ]['active'] = true;
-		}
-	}
-
-	/*
-     * Filter question sorting.
-     * @param array Question sortings.
-     * @since 2.3
+	/**
+	 * Filter question sorting.
+	 *
+	 * @param array Question sortings.
+	 * @since 2.3
 	 */
 	return apply_filters( 'ap_question_sorting', $navs );
 }
@@ -607,48 +466,51 @@ function ap_get_question_sorting( $current_url = '' ) {
 
 /**
  * Output answers tab.
+ *
  * @param string|boolean $base Current page url.
  * @since 2.0.1
  */
-function ap_answers_tab($base = false) {
-	$sort = isset( $_GET['ap_sort'] ) ? sanitize_text_field( wp_unslash( $_GET['ap_sort'] ) ) : ap_opt( 'answers_sort' );
+function ap_answers_tab( $base = false ) {
+	$sort = ap_sanitize_unslash( 'order_by', 'r',  ap_opt( 'answers_sort' ) );
 
 	if ( ! $base ) {
 		$base = get_permalink();
 	}
 
 	$navs = array(
-		'active' => array( 'link' => add_query_arg( [ 'ap_sort' => 'active' ], $base ), 'title' => __( 'Active', 'anspress-question-answer' ) ),
+		'active' => array( 'link' => add_query_arg( [ 'order_by' => 'active' ], $base ), 'title' => __( 'Active', 'anspress-question-answer' ) ),
 	);
 
 	if ( ! ap_opt( 'disable_voting_on_answer' ) ) {
-		$navs['voted'] = array( 'link' => add_query_arg( [ 'ap_sort' => 'voted' ], $base ), 'title' => __( 'Voted', 'anspress-question-answer' ) );
+		$navs['voted'] = array( 'link' => add_query_arg( [ 'order_by' => 'voted' ], $base ), 'title' => __( 'Voted', 'anspress-question-answer' ) );
 	}
 
-	$navs['newest'] = array( 'link' => add_query_arg( [ 'ap_sort' => 'newest' ], $base ), 'title' => __( 'Newest', 'anspress-question-answer' ) );
-	$navs['oldest'] = array( 'link' => add_query_arg( [ 'ap_sort' => 'oldest' ], $base ), 'title' => __( 'Oldest', 'anspress-question-answer' ) );
+	$navs['newest'] = array( 'link' => add_query_arg( [ 'order_by' => 'newest' ], $base ), 'title' => __( 'Newest', 'anspress-question-answer' ) );
+	$navs['oldest'] = array( 'link' => add_query_arg( [ 'order_by' => 'oldest' ], $base ), 'title' => __( 'Oldest', 'anspress-question-answer' ) );
 
-	echo '<ul class="ap-answers-tab ap-ul-inline clearfix">';
+	echo '<ul id="answers-order" class="ap-answers-tab ap-ul-inline clearfix">';
 	foreach ( (array) $navs as $k => $nav ) {
-		echo '<li'.($sort == $k ? ' class="active"' : '').'><a href="'.esc_attr( $nav['link'] ).'">'.esc_attr( $nav['title'] ).'</a></li>';
+		echo '<li' . ( $sort === $k ? ' class="active"' : '') . '><a href="' . esc_url( $nav['link'] .'#answers-order' ) . '">' . esc_attr( $nav['title'] ) . '</a></li>';
 	}
 	echo '</ul>';
 }
 
 /**
  * Answer meta to display.
+ *
  * @param false|integer $answer_id Answer id.
  * @return string
  * @since 2.0.1
  */
-function ap_display_answer_metas($answer_id = false) {
+function ap_display_answer_metas( $answer_id = false ) {
+
 	if ( false === $answer_id ) {
 		$answer_id = get_the_ID();
 	}
 
 	$metas = array();
-	if ( ap_answer_is_best( $answer_id ) ) {
-		$metas['best_answer'] = '<span class="ap-best-answer-label">'.__( 'Best answer', 'anspress-question-answer' ).'</span>';
+	if ( ap_is_selected( $answer_id ) ) {
+		$metas['best_answer'] = '<span class="ap-best-answer-label">' . __( 'Best answer', 'anspress-question-answer' ) . '</span>';
 	}
 
 	$metas['history'] = ap_last_active_time( $answer_id );
@@ -672,14 +534,16 @@ function ap_display_answer_metas($answer_id = false) {
 
 /**
  * Echo ask button.
+ *
  * @since 2.1
  */
 function ap_ask_btn() {
-	echo ap_get_ask_btn();
+	echo ap_get_ask_btn(); // WPCS: xss okay.
 }
 
 /**
- * Return the ask button. *
+ * Return the ask button.
+ *
  * @return string Ask button HTML
  * @since 2.1
  */
@@ -688,143 +552,37 @@ function ap_get_ask_btn() {
 
 	/**
 	 * Filter ask button link.
+	 *
 	 * @param string $link
 	 */
 	$link = apply_filters( 'ap_ask_btn_link', $link );
 
-	return '<a class="ap-btn-ask" href="'.$link.'">'.__( 'Ask question', 'anspress-question-answer' ).'</a>';
+	return '<a class="ap-btn-ask" href="' . $link . '">' . __( 'Ask question', 'anspress-question-answer' ) . '</a>';
 }
 
 /**
  * Include template php files.
+ *
  * @param string $file File name without extension.
  * @since 2.1
  */
-function ap_get_template_part($file) {
-	include ap_get_theme_location( $file.'.php' );
-}
-
-/**
- * Output the contents of help page.
- * @since 2.2
- */
-function ap_how_to_ask() {
-
-	$content = ap_get_how_to_ask();
-
-	if ( false !== $content ) {
-		echo $content;
-	}
-}
-
-/**
- * Get the contents of help page.
- * @return string|false
- * @since 2.2
- */
-function ap_get_how_to_ask() {
-	if ( ap_opt( 'question_help_page' ) != '' ) {
-		$help = get_post( (int) ap_opt( 'question_help_page' ) );
-		if ( $help ) {
-			return apply_filters( 'the_content', $help->post_content );
-		}
-	}
-	return false;
-}
-
-/**
- * Output the contents of answer help page.
- * @since 2.2
- */
-function ap_how_to_answer() {
-	$content = ap_get_how_to_answer();
-
-	if ( false !== $content ) {
-		echo $content;
-	}
-}
-
-/**
- * Get the contents of help page.
- * @return string|false
- * @since 2.2
- */
-function ap_get_how_to_answer() {
-
-	if ( ap_opt( 'answer_help_page' ) != '' ) {
-		$help = get_post( (int) ap_opt( 'answer_help_page' ) );
-
-		return $help->post_content;
+function ap_get_template_part( $file, $args = false ) {
+	if ( false !== $args ) {
+		extract( $args );
 	}
 
-	return false;
-}
-
-/**
- * Output AnsPress breadcrumbs
- */
-function ap_breadcrumbs() {
-
-	$navs = ap_get_breadcrumbs();
-
-	echo '<ul class="ap-breadcrumbs clearfix">';
-	echo '<li class="ap-breadcrumbs-home"><a href="'.esc_url( home_url( '/' ) ).'" class="apicon-home"></a></li>';
-	echo '<li><i class="apicon-chevron-right"></i></li>';
-
-	$i = 1;
-	$total_nav = count( $navs );
-
-	foreach ( $navs as $k => $nav ) {
-		if ( ! empty( $nav ) ) {
-			echo '<li>';
-			echo '<a href="'.esc_url( $nav['link'] ).'">'. esc_attr( $nav['title'] ).'</a>';
-			echo '</li>';
-
-			if ( $total_nav != $i ) {
-				echo '<li><i class="apicon-chevron-right"></i></li>';
-			}
-		}
-		++$i;
-	}
-
-	echo '</ul>';
-}
-
-/**
- * Get breadcrumbs array
- * @return array
- */
-function ap_get_breadcrumbs() {
-	$current_page = ap_current_page();
-	$title = ap_page_title();
-	$a = array();
-
-	$a['base'] = array( 'title' => ap_opt( 'base_page_title' ), 'link' => ap_base_page_link(), 'order' => 0 );
-
-	if ( is_question() ) {
-		$a['page'] = array( 'title' => substr( $title, 0, 30 ).(strlen( $title ) > 30 ? __( '..', 'anspress-question-answer' ) : ''), 'link' => get_permalink( get_question_id() ), 'order' => 10 );
-	} elseif ( 'base' != $current_page && '' != $current_page ) {
-		if ( 'user' == $current_page ) {
-			$a['page'] = array( 'title' => __( 'User', 'anspress-question-answer' ), 'link' => ap_user_link( ap_get_displayed_user_id() ), 'order' => 10 );
-			$a['user_page'] = array( 'title' => substr( $title, 0, 30 ).(strlen( $title ) > 30 ? __( '..', 'anspress-question-answer' ) : ''), 'link' => ap_user_link( ap_get_displayed_user_id(), get_query_var( 'user_page' ) ), 'order' => 10 );
-		} else {
-			$a['page'] = array( 'title' => substr( $title, 0, 30 ).(strlen( $title ) > 30 ? __( '..', 'anspress-question-answer' ) : ''), 'link' => ap_get_link_to( $current_page ), 'order' => 10 );
-		}
-	}
-
-	$a = apply_filters( 'ap_breadcrumbs', $a );
-
-	return ap_sort_array_by_order( $a );
+	include ap_get_theme_location( $file . '.php' );
 }
 
 /**
  * Return current AnsPress page
+ *
  * @return string
  */
 function ap_current_page() {
 	$query_var = get_query_var( 'ap_page' );
 
-	if ( '' == $query_var ) {
+	if ( '' === $query_var ) {
 		$query_var = 'base';
 	}
 
@@ -833,42 +591,42 @@ function ap_current_page() {
 
 /**
  * AnsPress CSS and JS.
+ *
  * @return array
  */
-function ap_assets( ) {
-	$dir = ap_env_dev() ? 'js' : 'min';
-	$min = ap_env_dev() ? '' : '.min';
-
+function ap_assets() {
 	$assets = array(
 		'js' => array(
-			'peity-js' => array( 'src' => ap_get_theme_url( 'js/jquery.peity.min.js' ), 'dep' => array( 'jquery' ) ),
-			'ap-initial-js' => array( 'src' => ap_get_theme_url( 'js/initial.min.js' ), 'dep' => array( 'jquery' ) ),
-			'ap-watch-js' => array( 'src' => ap_get_theme_url( 'js/watch.min.js' ), 'dep' => array( 'jquery' ) ),
+			'main'          => [ 'dep' => [ 'jquery', 'jquery-form', 'underscore', 'backbone' ], 'footer' => true ],
+			'upload'        => [ 'dep' => [ 'plupload', 'anspress-main' ], 'footer' => true ],
+			'notifications' => [ 'dep' => [ 'anspress-main' ], 'footer' => true ],
+			'theme' 				=> [ 'theme' => true, 'dep' => [ 'anspress-main' ], 'footer' => true ],
 		),
-
 		'css' => array(
-			'ap-theme-css' => array( 'src' => ap_get_theme_url( 'css/main.css' ) ),
-			'ap-fonts' => array( 'src' => ap_get_theme_url( 'fonts/style.css' ) ),
+			'main'  => array( 'theme' => true, 'dep' => [ 'anspress-fonts' ] ),
+			'fonts' => array( 'theme' => true ),
+			'rtl'   => array( 'theme' => true ),
 		),
 	);
 
-	if ( ap_env_dev() ) {
-		$assets['js']['anspress-functions'] = array( 'src' => ANSPRESS_URL.'assets/js/ap-functions.js', 'dep' => array( 'jquery', 'jquery-form' ) );
-		$assets['js']['anspress-js'] = array( 'src' => ANSPRESS_URL.'assets/js/anspress_site.js', 'dep' => array( 'jquery', 'jquery-form' ) );
-		$assets['js']['ap-theme-js'] = array( 'src' => ap_get_theme_url( 'js/ap.js' ), 'dep' => array( 'jquery', 'anspress-js' ) );
-	} else {
-		$assets['js']['anspress-js'] = array( 'src' => ANSPRESS_URL.'assets/min/anspress.min.js', 'dep' => array( 'jquery', 'jquery-form' ) );
-		$assets['js']['ap-theme-js'] = array( 'src' => ap_get_theme_url( 'min/anspress-theme.min.js' ), 'dep' => array( 'jquery', 'anspress-js' ) );
+	if ( is_ask() || ap_current_page() === 'edit' ) {
+		$assets['js']['main']['active'] = true;
+
+		if ( ap_user_can_upload( ) ) {
+			$assets['js']['upload']['active'] = true;
+		}
 	}
 
-	// Load mention JS.
-	if ( ! ap_opt('disable_mentions' ) ) {
-		$assets['js']['ap-mention-js'] = array( 'src' => ap_get_theme_url( 'min/mention.js' ), 'dep' => array( 'jquery' ) );
-		$assets['css']['ap-mention-css'] = array( 'src' => ap_get_theme_url( 'css/mention.css' ) );
+	if ( is_question() || ap_current_page() === 'edit' ) {
+		$assets['js']['main']['active'] = true;
+	}
+
+	if ( is_anspress() && ( ap_current_page() === 'base' || ap_current_page() === 'search' ) ) {
+		$assets['js']['main']['active'] = true;
 	}
 
 	if ( is_rtl() ) {
-		$assets['css']['ap-rtl'] = array( 'src' => ap_get_theme_url( 'css/RTL.css' ) );
+		$assets['css']['rtl']['active'] = true;
 	}
 
 	$assets['js'] = apply_filters( 'ap_assets_js', $assets['js'] );
@@ -879,31 +637,46 @@ function ap_assets( ) {
 
 /**
  * Enqueue AnsPress assets.
+ *
  * @since 2.4.6
  */
 function ap_enqueue_scripts() {
 	$assets = ap_assets();
 
-	if ( isset( $assets['js'] ) ) {
-		foreach ( $assets['js'] as $k => $js ) {
-			$dep = isset( $js['dep'] ) ? $js['dep'] : array();
-			wp_enqueue_script( $k, $js['src'], $dep, AP_VERSION );
+	foreach ( (array) $assets['js'] as $k => $js ) {
+		$src = '/min/' . $k . '.min.js';
+
+		$src = ! empty( $js['theme'] ) ? ap_get_theme_url( 'js' . $src, false, false ) : ANSPRESS_URL . 'assets/js' . $src;
+
+		$dep = isset( $js['dep'] ) ? $js['dep'] : array();
+		$footer = isset( $js['footer'] ) ? $js['footer'] : false;
+		wp_register_script( 'anspress-' . $k, $src, $dep, AP_VERSION, $footer );
+
+		if ( isset( $js['active'] ) && $js['active'] ) {
+			wp_enqueue_script( 'anspress-' . $k );
 		}
 	}
 
-	if ( isset( $assets['css'] ) ) {
-		foreach ( $assets['css'] as $k => $css ) {
-			$dep = isset( $css['dep'] ) ? $css['dep'] : array();
-			wp_enqueue_style( $k, $css['src'], $dep, AP_VERSION );
+	foreach ( (array) $assets['css'] as $k => $css ) {
+		$src = '/min/' . $k . '.min.css';
+
+		$src = ! empty( $css['theme'] ) ? ap_get_theme_url( 'css' . $src, false, false ) : ANSPRESS_URL . 'assets/css' . $src;
+
+		$dep = isset( $css['dep'] ) ? $css['dep'] : array();
+		wp_register_style( 'anspress-' . $k, $src, $dep, AP_VERSION );
+
+		if ( isset( $css['active'] ) && $css['active'] ) {
+			wp_enqueue_style( 'anspress-' . $k );
 		}
 	}
 }
 
+/**
+ * Get all list filters.
+ *
+ * @param string $current_url Current URL.
+ */
 function ap_get_list_filters( $current_url = '' ) {
-	if ( is_home() || is_front_page() ) {
-		$current_url = home_url( '/' );
-	}
-
 	$param = array();
 	$search_q = get_query_var( 'ap_s' );
 
@@ -911,12 +684,11 @@ function ap_get_list_filters( $current_url = '' ) {
 		$param['ap_s'] = $search_q;
 	}
 
-	$link = add_query_arg( $param, $current_url );
-
 	$filters = array(
-		'sort' => array(
-			'title' => __( 'Sort', 'anspress-question-answer' ),
-			'items' => ap_get_question_sorting(),
+		'order_by' => array(
+			'title'    => __( 'Order By', 'anspress-question-answer' ),
+			'items'    => [],
+			'multiple' => false,
 		),
 	);
 
@@ -928,16 +700,237 @@ function ap_get_list_filters( $current_url = '' ) {
 	return apply_filters( 'ap_list_filters', $filters );
 }
 
+/**
+ * Output list filters form.
+ *
+ * @param string $current_url Current Url.
+ */
 function ap_list_filters( $current_url = '' ) {
 	$filters = ap_get_list_filters( $current_url );
-	$ap_filter = isset( $_GET['ap_filter'] ) ? wp_unslash( $_GET['ap_filter'] ) : '';
+
+	echo '<form id="ap-filters" class="ap-filters clearfix" method="POST">';
+
 	foreach ( (array) $filters as $key => $filter ) {
-		echo '<div class="ap-dropdown filter-'.esc_attr( $key ).'">';
-		echo '<a id="ap-sort-anchor" class="ap-dropdown-toggle" href="#" data-query="list_filter::'. wp_create_nonce( 'ap_ajax_nonce' ) .'::'. esc_attr( $key ) .'" data-action="load_filter">'. esc_attr( $filter[ 'title' ] ) .'</a>';
+		$active = '';
+
+		$current_order_by = ap_get_current_list_filters( 'order_by' );
+
+		if ( ! empty( $current_order_by ) ) {
+			$active_arr = ap_search_array( ap_get_questions_orderby(), 'value', $current_order_by );
+
+			if ( ! empty( $active_arr ) ) {
+				$active = ': <span class="ap-filter-active">' . $active_arr[0]['label'] . '</span>';
+			}
+		}
+
+		$active = apply_filters( 'ap_list_filter_active_' . $key, $active, $filter );
+
+		$args = wp_json_encode( [ '__nonce' => wp_create_nonce( 'filter_' . $key ), 'filter' => $key ] );
+		echo '<div class="ap-dropdown ap-filter filter-' . esc_attr( $key ) . '">';
+		echo '<a class="ap-dropdown-toggle ap-filter-toggle" href="#" ap-filter ap-query="' . esc_js( $args ) . '">' . esc_attr( $filter['title'] ) . $active . '</a>'; // xss okay.
 		echo '</div>';
 	}
-	// Send current GET, so that it can be used by JS templates.
-	if ( isset( $_GET['ap_filter'] ) ) {
-		echo '<script type="text/html" id="current_filter">'. http_build_query( $ap_filter ) .'</script>';
+
+	foreach ( (array) ap_get_current_list_filters() as $key => $filter ) {
+		if ( is_array( $filter ) ) {
+			foreach ( (array) $filter as $f ) {
+				echo '<input type="hidden" name="filters[' . esc_attr( $key ) . '][]" value="' . esc_attr( $f ) . '" />';
+			}
+		} else {
+			echo '<input type="hidden" name="filters[' . esc_attr( $key ) . ']" value="' . esc_attr( $filter ) . '" />';
+		}
 	}
+
+	echo '<button id="ap-filter-reset" type="submit" name="reset-filter" title="' . esc_attr__( 'Reset sorting and filter', 'anspress-question-answer' ) . '"><i class="apicon-x"></i><span>' . esc_attr__( 'Clear Filter', 'anspress-question-answer' ) . '</span></button>';
+
+	echo '</form>';
+
+	// Send current GET, so that it can be used by JS templates.
+	if ( ap_get_current_list_filters() ) {
+		echo '<script type="application/json" id="ap_current_filters">' . wp_json_encode( ap_get_current_list_filters() ) . '</script>'; // xss okay.
+	}
+}
+/**
+ * Print select anser HTML button.
+ *
+ * @param mixed $_post Post.
+ * @return string
+ */
+function ap_select_answer_btn_html( $_post = null ) {
+
+	if ( ! ap_user_can_select_answer( $_post ) ) {
+		return;
+	}
+
+	$_post = ap_get_post( $_post );
+	$nonce = wp_create_nonce( 'select-answer-' . $_post->ID );
+
+	$q = esc_js( wp_json_encode( [ 'answer_id' => $_post->ID, 'nonce' => $nonce ] ) );
+	$active = false;
+
+	$title = __( 'Select this answer as best', 'anspress-question-answer' );
+	$label = __( 'Select', 'anspress-question-answer' );
+
+	$have_best = ap_have_answer_selected( $_post->post_parent );
+	$selected = ap_is_selected( $_post );
+	$hide = false;
+
+	if ( $have_best && $selected ) {
+		$title = __( 'Unselect this answer', 'anspress-question-answer' );
+		$label = __( 'Unselect', 'anspress-question-answer' );
+		$active = true;
+	}
+
+	if ( $have_best && ! $selected ) {
+		$hide = true;
+	}
+
+	return '<a href="#" class="ap-btn-select ap-btn ' . ( $active ? ' active' : '' ) . ( $hide ? ' hide' : '' ) . '" ap="select_answer" ap-query="' . $q . '" title="' . $title . '">' . $label . '</a>';
+}
+
+/**
+ * Output chnage post status button.
+ *
+ * @param 	mixed $_post Post.
+ * @return 	null|string
+ * @since 	4.0.0
+ */
+function ap_post_status_btn_args( $_post = null ) {
+	$_post = ap_get_post( $_post );
+	$args = [];
+
+	if ( ap_user_can_change_status( $_post->ID ) ) {
+		global $wp_post_statuses;
+		$allowed_status = [ 'publish', 'private_post', 'moderate' ];
+		$status_labels = [];
+
+		foreach ( (array) $allowed_status as $s ) {
+			if ( isset( $wp_post_statuses[ $s ] ) ) {
+				$status_labels[ $s ] = esc_attr( $wp_post_statuses[ $s ]->label );
+			}
+		}
+
+		foreach ( (array) $status_labels as $slug => $label ) {
+			$can = true;
+
+			if ( 'moderate' === $slug  && ! ap_user_can_change_status_to_moderate() ) {
+				$can = false;
+			}
+
+			if ( $can ) {
+				$args[] = array(
+					'cb'  => 'status',
+					'active'  => ( $slug === $_post->post_status ),
+					'query'   => [ 'status' => $slug, '__nonce' => wp_create_nonce( 'change-status-' . $slug . '-' . $_post->ID ), 'post_id' => $_post->ID ],
+					'label'   => esc_attr( $label ),
+				);
+			}
+		}
+
+		return $args;
+	}
+}
+
+
+/**
+ * Return set featured question action args.
+ *
+ * @param  boolean|integer $post_id Post ID.
+ * @return array
+ */
+function ap_featured_post_args( $post_id = false ) {
+	if ( ! is_user_logged_in() || ! ap_user_can_toggle_featured() ) {
+		return [];
+	}
+
+	if ( false === $post_id ) {
+		$post_id = get_question_id();
+	}
+
+	$is_featured = ap_is_featured_question( $post_id );
+
+	if ( $is_featured ) {
+		$title = __( 'Unmark this question as featured', 'anspress-question-answer' );
+		$label = __( 'Unfeature', 'anspress-question-answer' );
+	} else {
+		$title = __( 'Mark this question as featured', 'anspress-question-answer' );
+		$label = __( 'Feature', 'anspress-question-answer' );
+	}
+
+	return array(
+		'cb'     => 'toggle_featured',
+		'active' => $is_featured,
+		'query'  => [ '__nonce' => wp_create_nonce( 'set_featured_' . $post_id ), 'post_id' => $post_id ],
+		'title'  => esc_attr( $title ),
+		'label'  => esc_attr( $label ),
+	);
+}
+
+/**
+ * Output question subscribe button.
+ *
+ * @param object|integer|false $_post Post object or ID.
+ * @param boolean              $echo Echo or return.
+ * @return string|null
+ * @since 4.0.0
+ */
+function ap_subscribe_btn( $_post = false, $echo = true ) {
+	$_post = ap_get_post( $_post );
+
+	$args = wp_json_encode( [ '__nonce' => wp_create_nonce( 'subscribe_' . $_post->ID ), 'id' => $_post->ID ] );
+	$subscribers = ap_get_post_field( 'subscribers', $_post );
+	$subscribed = ap_is_user_subscriber( 'question', $_post->ID );
+	$label = $subscribed ? __( 'Unsubscribe', 'anspress-question-answer' ) : __( 'Subscribe', 'anspress-question-answer' );
+
+	$html = '<a href="#" class="ap-btn ap-btn-subscribe ap-btn-small ' . ( $subscribed ? 'active' : '' ) .'" ap-subscribe ap-query="' . esc_js( $args ) . '">' . $label . '</a>' . '<span class="ap-btn ap-subscribers-count ap-btn-small">' . $subscribers . '</span>';
+
+	if ( ! $echo ) {
+		return $html;
+	}
+
+	echo $html; // WPCS: xss okay.
+}
+
+function ap_menu_obejct() {
+	$menu_items = [];
+
+	foreach ( (array) anspress()->pages as $k => $args ) {
+		if ( $args['show_in_menu'] ) {
+			$menu_items[] = (object) array(
+				'ID'               => 1,
+				'db_id'            => 0,
+				'menu_item_parent' => 0,
+				'object_id'        => 1,
+				'post_parent'      => 0,
+				'type'             => 'anspress-links',
+				'object'           => $k,
+				'type_label'       => __( 'AnsPress links', 'anspress-question-answer' ),
+				'title'            => $args['title'],
+				'url'              => home_url( '/' ),
+				'target'           => '',
+				'attr_title'       => '',
+				'description'      => '',
+				'classes'          => [ 'anspress-menu-' . $k ],
+				'xfn'              => '',
+			);
+		}
+	}
+
+	return $menu_items;
+}
+
+/**
+ * Return AnsPress page slug.
+ *
+ * @param string $slug Default page slug.
+ * @return string
+ */
+function ap_get_page_slug( $slug ) {
+	$option = ap_opt( $slug . '_page_slug' );
+
+	if ( ! empty( $option ) ) {
+		$slug = $option;
+	}
+
+	return apply_filters( 'ap_page_slug_' . $slug, $slug );
 }

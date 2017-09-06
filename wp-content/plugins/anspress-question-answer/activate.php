@@ -13,25 +13,48 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class AP_Activate
-{
+/**
+ * Activate AnsPress.
+ */
+class AP_Activate {
 	/**
 	 * Instance of this class.
+	 *
 	 * @var      object
 	 */
 	protected static $instance = null;
+
+	/**
+	 * Char set.
+	 *
+	 * @var string
+	 */
 	public $charset_collate;
+
+	/**
+	 * Tables
+	 *
+	 * @var array
+	 */
 	public $tables = array();
+
+	/**
+	 * Network wide activate.
+	 *
+	 * @var boolean
+	 */
 	public $network_wide;
 
 	/**
 	 * Return an instance of this class.
-	 * @return    object    A single instance of this class.
+	 *
+	 * @param string|boolean $network_wide Actiavte plugin network wide.
+	 * @return object A single instance of this class.
 	 */
 	public static function get_instance( $network_wide = '' ) {
 
 		// If the single instance hasn't been set, set it now.
-		if ( null == self::$instance ) {
+		if ( null === self::$instance ) {
 			anspress();
 			self::$instance = new self;
 			global $network_wide;
@@ -41,9 +64,14 @@ class AP_Activate
 		return self::$instance;
 	}
 
+	/**
+	 * Construct class.
+	 */
 	public function __construct() {
 		global $network_wide;
 		$this->network_wide = $network_wide;
+		$this->disable_ext();
+		$this->enable_addons();
 
 		// Append table names in $wpdb.
 		ap_append_table_names();
@@ -55,127 +83,122 @@ class AP_Activate
 		}
 	}
 
-	public function meta_table() {
-		global $wpdb;
-
-		if ( $wpdb->get_var( "show tables like '{$wpdb->ap_meta}'" ) != $wpdb->ap_meta ) {
-			$this->tables[] = 'CREATE TABLE IF NOT EXISTS `'.$wpdb->ap_meta.'` (
-                `apmeta_id` bigint(20) NOT NULL AUTO_INCREMENT,
-                `apmeta_userid` bigint(20) DEFAULT NULL,
-                `apmeta_type` varchar(256) DEFAULT NULL,
-                `apmeta_actionid` bigint(20) DEFAULT NULL,
-                `apmeta_value` text,
-                `apmeta_param` LONGTEXT DEFAULT NULL,
-                `apmeta_date` timestamp NULL DEFAULT NULL,
-                PRIMARY KEY (`apmeta_id`)
-	            )'.$this->charset_collate.';';
-		}
-	}
-
-	public function activity_table() {
-		global $wpdb;
-
-		if ( $wpdb->get_var( "show tables like '{$wpdb->ap_activity}'" ) != $wpdb->ap_activity ) {
-			$this->tables[] = 'CREATE TABLE IF NOT EXISTS `'.$wpdb->ap_activity.'` (
-                `id` bigint(20) NOT NULL AUTO_INCREMENT,
-                `user_id` bigint(20) DEFAULT NULL,
-                `secondary_user` bigint(20) DEFAULT NULL,
-                `type` varchar(256) DEFAULT NULL,
-                `parent_type` varchar(256) DEFAULT NULL,
-                `status` varchar(256) DEFAULT NULL,
-                `content` LONGTEXT DEFAULT NULL,
-                `permalink` text DEFAULT NULL,
-                `question_id` bigint(20) DEFAULT NULL,
-                `answer_id` bigint(20) DEFAULT NULL,
-                `item_id` bigint(20) DEFAULT NULL,
-                `term_ids` LONGTEXT DEFAULT NULL,
-                `created` timestamp NULL DEFAULT NULL,
-                `updated` timestamp NULL DEFAULT NULL,
-                PRIMARY KEY (`id`)
-			    )'.$this->charset_collate.';';
-		}
-	}
-
 	/**
-	 * AnsPress activity meta table.
+	 * Disable old AnsPress extensions.
 	 */
-	public function activity_meta_table() {
-		global $wpdb;
-
-		if ( $wpdb->get_var( "show tables like '{$wpdb->ap_activitymeta}'" ) != $wpdb->ap_activitymeta ) {
-			$this->tables[] = 'CREATE TABLE IF NOT EXISTS `'.$wpdb->ap_activitymeta."` (
-                  `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                  `ap_activity_id` bigint(20) unsigned NOT NULL DEFAULT '0',
-                  `meta_key` varchar(255) DEFAULT NULL,
-                  `meta_value` longtext,
-                  PRIMARY KEY (`meta_id`)
-				)".$this->charset_collate.';';
-		}
+	public function disable_ext() {
+		deactivate_plugins( [
+			'categories-for-anspress/categories-for-anspress.php',
+			'tags-for-anspress/tags-for-anspress.php',
+			'anspress-email/anspress-email.php',
+			'question-labels/question-labels.php',
+			'anspress-paid-membership/anspress-paid-membership.php',
+		] );
 	}
 
 	/**
-	 * AnsPress notification table.
+	 * Enable default addons.
 	 */
-	public function notification_table() {
-		global $wpdb;
-
-		if ( $wpdb->get_var( "show tables like '{$wpdb->ap_notifications}'" ) != $wpdb->ap_notifications ) {
-			$this->tables[] = 'CREATE TABLE IF NOT EXISTS `'.$wpdb->ap_notifications.'` (
-                `noti_id` bigint(20) NOT NULL AUTO_INCREMENT,
-                `noti_activity_id` bigint(20) NOT NULL,
-                `noti_user_id` bigint(20) NOT NULL,
-                `noti_status` varchar(225) NOT NULL,                
-                `noti_date` timestamp NOT NULL,
-                PRIMARY KEY (`noti_id`)
-	        )'.$this->charset_collate.';';
-		}
+	public function enable_addons() {
+		ap_activate_addon( 'free/reputation.php' );
+		ap_activate_addon( 'free/email.php' );
 	}
 
 	/**
-	 * AnsPress subscriber table.
+	 * Ap_qameta table.
+	 */
+	public function qameta_table() {
+		global $wpdb;
+
+		// @codingStandardsIgnoreLine
+		$this->tables[] = 'CREATE TABLE `' . $wpdb->ap_qameta . '` (
+			`post_id` bigint(20) NOT NULL,
+			`selected_id` bigint(20) DEFAULT NULL,
+			`comments` bigint(20) DEFAULT 0,
+			`answers` bigint(20) DEFAULT 0,
+			`ptype` varchar(100) DEFAULT NULL,
+			`featured` tinyint(1) DEFAULT 0,
+			`selected` tinyint(1) DEFAULT 0,
+			`votes_up` bigint(20) DEFAULT 0,
+			`votes_down` bigint(20) DEFAULT 0,
+			`subscribers` TEXT DEFAULT NULL,
+			`views` bigint(20) DEFAULT 0,
+			`closed` tinyint(1) DEFAULT 0,
+			`flags` bigint(20) DEFAULT 0,
+			`terms` LONGTEXT DEFAULT NULL,
+			`attach` LONGTEXT DEFAULT NULL,
+			`activities` LONGTEXT DEFAULT NULL,
+			`fields` LONGTEXT DEFAULT NULL,
+			`roles` varchar(100) DEFAULT NULL,
+			`last_updated` timestamp NULL DEFAULT NULL,
+			UNIQUE KEY `post_id` (`post_id`)
+		)' . $this->charset_collate . ';';
+	}
+
+	/**
+	 * AnsPress ap_votes table.
+	 */
+	public function votes_table() {
+		global $wpdb;
+
+		$this->tables[] = 'CREATE TABLE `' . $wpdb->ap_votes . '` (
+				`vote_id` bigint(20) NOT NULL AUTO_INCREMENT,
+				`vote_post_id` bigint(20) NOT NULL,
+				`vote_user_id` bigint(20) NOT NULL,
+				`vote_rec_user` bigint(20) NOT NULL,
+				`vote_type` varchar(100) DEFAULT NULL,
+				`vote_value` varchar(100) DEFAULT NULL,
+				`vote_date` timestamp NULL DEFAULT NULL,
+				PRIMARY KEY (`vote_id`)
+			)' . $this->charset_collate . ';';
+	}
+
+	/**
+	 * AnsPress views table.
+	 */
+	public function views_table() {
+		global $wpdb;
+
+		$this->tables[] = 'CREATE TABLE `' . $wpdb->ap_views . '` (
+				`view_id` bigint(20) NOT NULL AUTO_INCREMENT,
+				`view_user_id` bigint(20) DEFAULT NULL,
+				`view_type` varchar(100) DEFAULT NULL,
+				`view_ref_id` bigint(20) DEFAULT NULL,
+				`view_ip` varchar(39),
+				`view_date` timestamp NULL DEFAULT NULL,
+				PRIMARY KEY (`view_id`)
+			)' . $this->charset_collate . ';';
+	}
+
+	/**
+	 * AnsPress reputation table.
+	 */
+	public function reputation_table() {
+		global $wpdb;
+
+		$this->tables[] = 'CREATE TABLE `' . $wpdb->ap_reputations . '` (
+				`rep_id` bigint(20) NOT NULL AUTO_INCREMENT,
+				`rep_user_id` bigint(20) DEFAULT NULL,
+				`rep_event` varchar(100) DEFAULT NULL,
+				`rep_ref_id` bigint(20) DEFAULT NULL,
+				`rep_date` timestamp NULL DEFAULT NULL,
+				PRIMARY KEY (`rep_id`)
+			)' . $this->charset_collate . ';';
+	}
+
+	/**
+	 * AnsPress email subscription related table.
 	 */
 	public function subscribers_table() {
 		global $wpdb;
 
-		if ( $wpdb->get_var( "show tables like '{$wpdb->ap_subscribers}'" ) != $wpdb->ap_subscribers ) {
-			$this->tables[] = 'CREATE TABLE IF NOT EXISTS `'.$wpdb->ap_subscribers.'` (
-                `subs_id` bigint(20) NOT NULL AUTO_INCREMENT,               
-                `subs_user_id` bigint(20) NOT NULL,
-                `subs_question_id` bigint(20) NOT NULL,
-                `subs_item_id` bigint(20) NOT NULL,
-                `subs_activity` varchar(225) NOT NULL,
-                `subs_answer_id` bigint(20) NOT NULL,
-                PRIMARY KEY (`subs_id`)
-	        )'.$this->charset_collate.';';
-		}
-
-		// Check if answer_id column exists if not add it.
-		ap_db_subscriber_answer_id_col();
-	}
-
-	/**
-	 * Check subscribers table for old column names.
-	 * If exists then rename it.
-	 */
-	public function fix_subscribers_table() {
-		global $wpdb;
-		$subscriber_cols = $wpdb->get_results("SHOW COLUMNS FROM {$wpdb->prefix}ap_subscribers" );
-		$subscriber_old_cols = array(
-			'id' 			=> 'bigint(20) NOT NULL AUTO_INCREMENT',
-			'user_id' 		=> 'bigint(20)',
-			'question_id' 	=> 'bigint(20)',
-			'item_id' 		=> 'bigint(20)',
-			'activity' 		=> 'varchar(225 )',
-		);
-
-		if ( $subscriber_cols ) {
-
-			foreach ( $subscriber_cols as $col ) {
-				if ( in_array($col->Field, array_keys($subscriber_old_cols ) ) ) {
-					$wpdb->query( "ALTER TABLE `{$wpdb->prefix}ap_subscribers` CHANGE {$col->Field} subs_{$col->Field} ".$subscriber_old_cols[$col->Field] );
-				}
-			}
-		}
+		$this->tables[] = 'CREATE TABLE `' . $wpdb->ap_subscribers . '` (
+				`subs_id` bigint(20) NOT NULL AUTO_INCREMENT,
+				`subs_user_id` bigint(20) NOT NULL,
+				`subs_ref_id` bigint(20) NOT NULL,
+				`subs_event` varchar(100) NOT NULL,
+				PRIMARY KEY (`subs_id`)
+			)' . $this->charset_collate . ';';
 	}
 
 	/**
@@ -183,12 +206,12 @@ class AP_Activate
 	 */
 	public function insert_tables() {
 		global $wpdb;
-		$this->charset_collate = ! empty( $wpdb->charset ) ? 'DEFAULT CHARACTER SET '.$wpdb->charset : '';
+		$this->charset_collate = ! empty( $wpdb->charset ) ? 'DEFAULT CHARACTER SET ' . $wpdb->charset : '';
 
-		$this->meta_table();
-		$this->activity_table();
-		$this->activity_meta_table();
-		$this->notification_table();
+		$this->qameta_table();
+		$this->votes_table();
+		$this->views_table();
+		$this->reputation_table();
 		$this->subscribers_table();
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -198,83 +221,54 @@ class AP_Activate
 				dbDelta( $table );
 			}
 		}
-
-		/*
-        if( $activity_cols ){
-            if ( !in_array($col->Field, 'term_ids' ) )
-                $wpdb->query( "ALTER TABLE `{$wpdb->prefix}ap_activity` ADD term_ids LONGTEXT after item_id;" );
-		}*/
-
-		$this->fix_subscribers_table();
 	}
 
 	/**
 	 * Create base pages, add roles, add caps and create tables
 	 */
-	public function activate( ) {
+	public function activate() {
 
 		// add roles.
 		$ap_roles = new AP_Roles;
 		$ap_roles->add_roles();
 		$ap_roles->add_capabilities();
 
-		ap_create_base_page();
-
-		if (  in_array(ap_opt( 'ap_version' ), array( '2.3.8', '2.4-beta1', '2.4-beta2', '2.4-beta3', '2.4-beta4' ) )  ) {
+		if ( true === version_compare( ap_opt( 'ap_version' ), '4.0.0-alpha.1', '<' ) ) {
 			update_option( 'ap_update_helper', true );
 		}
 
-		if ( ap_opt( 'ap_version' ) != AP_VERSION ) {
+		if ( ap_opt( 'ap_version' ) !== AP_VERSION ) {
 			ap_opt( 'ap_installed', 'false' );
 			ap_opt( 'ap_version', AP_VERSION );
 		}
 
+		if ( get_option( 'anspress_db_version' ) === '' ) {
+			update_option( 'anspress_using_previous', 'true' );
+		}
+
 		$this->insert_tables();
-		ap_opt('db_version', AP_DB_VERSION );
+		update_option( 'anspress_db_version', AP_DB_VERSION );
 		update_option( 'anspress_opt', get_option( 'anspress_opt' ) + ap_default_options() );
 
 		ap_opt( 'ap_flush', 'true' );
 		flush_rewrite_rules( false );
 	}
 
+	/**
+	 * Network activate.
+	 */
 	public function network_activate() {
 		global $wpdb;
-		// $current_blog = $wpdb->blogid;
-		// Get all blogs in the network and activate plugin on each one
-		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
 
-		foreach ( $blog_ids as $blog_id ) {
-			switch_to_blog( $blog_id );
+		// Get all blogs in the network and activate plugin on each one
+		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" ); // db call ok, cache ok.
+
+		foreach ( (array) $blog_ids as $blog_id ) {
+			switch_to_blog( $blog_id ); // @codingStandardsIgnoreLine
 			$this->activate();
 			restore_current_blog();
 		}
 	}
 }
 
-/**
- * Check if DB version in database is not equal to current.
- * @return boolean
- */
-function ap_db_version_is_lower() {
-	ap_opt( 'db_version', 18 );
-	$opt = ap_opt('db_version' );
-	if ( ! empty( $opt ) && $opt > AP_DB_VERSION  ) {
-		return false;
-	}
 
-	return true;
-}
-
-/**
- * Add `subs_answer_id` col in ap_subscribers table.
- * @since 3.0.0
- */
-function ap_db_subscriber_answer_id_col() {
-	global $wpdb;
-	if ( $wpdb->get_var( "show tables like '{$wpdb->ap_subscribers}'" ) == $wpdb->ap_subscribers ) {
-		$ap_subscribers_cols = $wpdb->get_col("SHOW COLUMNS FROM `$wpdb->ap_subscribers`" );
-		if ( ! in_array( 'subs_answer_id', $ap_subscribers_cols ) ) {
-			$wpdb->query( "ALTER TABLE `$wpdb->ap_subscribers` ADD subs_answer_id bigint(20) NOT NULL after subs_question_id;" );
-		}
-	}
-}

@@ -13,19 +13,25 @@
  * Class for AnsPress base page shortcode
  */
 class AnsPress_BasePage_Shortcode {
-
+	/**
+	 * Instance.
+	 *
+	 * @var Instance
+	 */
 	protected static $instance = null;
 
+	/**
+	 * Get current instance.
+	 */
 	public static function get_instance() {
 
-		// create an object
+		// Create an object.
 		null === self::$instance && self::$instance = new self;
-
-		return self::$instance; // return the object
+		return self::$instance; // Return the object.
 	}
 
 	/**
-	 * Control the output of [anspress] shortcode
+	 * Control the output of [anspress] shortcode.
 	 *
 	 * @param  array  $atts  {
 	 *     Attributes of the shortcode.
@@ -33,31 +39,36 @@ class AnsPress_BasePage_Shortcode {
 	 *     $categories 			slug of question_category
 	 *     $tags 				slug of question_tag
 	 *     $tax_relation 		taxonomy relation, see here https://codex.wordpress.org/Taxonomies
-	 *     $tags_operator 		operator for question_tag taxnomomy
-	 *     $categories_operator operator for question_category taxnomomy
+	 *     $tags_operator 		operator for question_tag taxonomy
+	 *     $categories_operator operator for question_category taxonomy
 	 *     $page 				Select a page to display.
 	 *     $hide_list_head 		Hide list head?
-	 *     $sortby 				Sort by.
+	 *     $order_by 				Sort by.
 	 *  }
 	 * @param  string $content
 	 * @return string
 	 * @since 2.0.0
-	 * @since  3.0.0 Added new attribute `hide_list_head` and `attr_sortby`.
+	 * @since  3.0.0 Added new attribute `hide_list_head` and `attr_order_by`.
 	 */
 	public function anspress_sc( $atts, $content = '' ) {
 		global $questions, $ap_shortcode_loaded;
 
 		// Check if AnsPress shortcode already loaded.
 		if ( true === $ap_shortcode_loaded ) {
-			return __('AnsPress shortcode cannot be nested.', 'anspress-question-answer' );
+			return __( 'AnsPress shortcode cannot be nested.', 'anspress-question-answer' );
 		}
+
+		wp_enqueue_script( 'anspress-main' );
+		wp_enqueue_script( 'anspress-theme' );
+		wp_enqueue_style( 'anspress-main' );
+		wp_enqueue_style( 'anspress-fonts' );
 
 		$ap_shortcode_loaded = true;
 
-		$this->attributes($atts, $content );
+		$this->attributes( $atts, $content );
 
 		ob_start();
-		echo '<div id="anspress">';
+		echo '<div id="anspress" class="anspress">';
 
 			/**
 			 * Action is fired before loading AnsPress body.
@@ -67,11 +78,12 @@ class AnsPress_BasePage_Shortcode {
 			// Include theme file.
 			ap_page();
 
-			// Linkback to author.
-			if ( ! ap_opt( 'author_credits' ) ) {
-				echo '<div class="ap-cradit">' . __( 'Question and answer is powered by', 'anspress-question-answer' ). ' <a href="https://anspress.io" traget="_blank">AnsPress.io</a>' . '</div>';
-			}
 		echo '</div>';
+		// Linkback to author.
+		if ( ! ap_opt( 'author_credits' ) ) {
+			echo '<div class="ap-cradit">' . esc_attr__( 'Question and answer is powered by', 'anspress-question-answer' ). ' <a href="https://anspress.io" traget="_blank">AnsPress.io</a></div>';
+		}
+
 		wp_reset_postdata();
 		$ap_shortcode_loaded = false;
 		return ob_get_clean();
@@ -79,6 +91,7 @@ class AnsPress_BasePage_Shortcode {
 
 	/**
 	 * Get attributes from shortcode and set it as query var.
+	 *
 	 * @since 3.0.0
 	 */
 	public function attributes( $atts, $content ) {
@@ -121,9 +134,8 @@ class AnsPress_BasePage_Shortcode {
 		}
 
 		// Sort by.
-		if ( isset( $atts['sortby'] ) ) {
-			set_query_var( 'ap_sortby',  ap_sanitize_unslash( $atts['sortby'] ) );
-			$_GET['ap_sortby'] = $atts['sortby'];
+		if ( isset( $atts['order_by'] ) ) {
+			$_GET['filters'] = [ 'order_by' => $atts['order_by'] ];
 		}
 	}
 

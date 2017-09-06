@@ -3,57 +3,65 @@ Contributors: nerdaryan
 Donate link: https://www.paypal.me/nerdaryan
 Tags: question, answer, q&a, forum, profile, stackoverflow, quora, buddypress
 Requires at least: 4.0
-Tested up to: 4.6
-Stable tag: 3.0.7
+Tested up to: 4.7
+Stable tag: 4.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Free question and answer plugin for WordPress. Made with developers in mind, highly customizable.
 
 == Description ==
-Demo & support forum: http://anspress.io/
-GitHub repo: [Git AnsPress](https://github.com/anspress/anspress/)
+AnsPress is an open source, developer friendly, question and answer plugin for WordPress. AnsPress adds a full question and answer system to your existing WordPress site. It can be used to create a q&a network similar to StackOverflow and quora, or be a single page in existing site. The plugin supports multi-languages, shortcodes, reCAPTCHA, email and push notification and more.
 
-Easily add question and answer section like stackoverflow.com or quora.com in your WordPress.
-AnsPress is a most complete question and answer system for WordPress. AnsPress is made with developers in mind, highly customizable. AnsPress provide an easy to use override system for theme.
+AnsPress is not just limited to question and answer. It can be used in many different ways such as BugTracker, Company Internal QA board, support tickets, FAQ etc. Anspress is trusted and used by many popular companies and sites at scale.
 
-Extensions:
+**Performance and Optimizations:**
 
-  * [AnsPress email notification](http://anspress.io/downloads/anspress-email/)
-  * [Categories for AnsPress](http://anspress.io/downloads/categories-for-anspress/)
-  * [Tags for AnsPress](http://anspress.io/downloads/tags-for-anspress/)
+In our latest release we've made big improvements to performance and have tested in many different server environments. It runs smoothly on every type of server with minimal impact on load times. AnsPress (including all of its functionalities) is very fast comparing to other QA plugins. In the latest release we have made major improvements to reduce MySQL queries and to increase the speed of page load for all page templates within plugin.
 
-Developers tool
+**Developer Friendly:**
 
-  * [AnsPress extension boilerplate builder](http://anspress.io/downloads/anspress-boilerplate-extension/)
+AnsPress is built with developers in mind and can easily be extended to fit your needs. All parts of layout templates can be overridden. Our source code follows WP coding standards and is properly commented. We are working on documentation site which will be available soon.
 
-List of features:
+**Contributors:**
 
-  * Notification
-  * Featured Question
-  * Sorting question and answer by many options.
-  * Ajax based form submission
-  * Theme system
-  * Flag and moderate posts
-  * Voting on question and answer
-  * Question tags and categories
-  * Question labels (i.e. Open, close, duplicate) new labels can be added easily.
-  * Select best answer
-  * Tags suggestions
-  * Comment on question and answer
-  * reCaptcha
-  * User level : Participant, Editor, Moderator
-  * Advance user access controls
-  * Email notification
-  * User can add questions to his favorite
-  * User can edit profile
-  * User can upload cover photo
-  * Friends and followers system
-  * User points system (reputation)
+This plugin wouldn't be possible without a huge amount of contribution. Check our contributors at https://anspress.io/contributors/
 
+**Support and Demo:**
 
-= Help & Support =
-For fast help and support, please post on our forum http://anspress.io/questions/
+We provide support on our site: https://anspress.io/questions
+Our support section uses actual version of AnsPress, so you can check out the support site if you want to see full working version of AnsPress.
+You can also take the demo site for a test drive https://d.anspress.io/
+
+**AnsPress Key Features:**
+
+* Submit / Filter / Order / Edit / Delete Question
+* Answer / Comment
+* Vote and Select Best Answer
+* Notification Emails and Web Push Notifications
+* 10+ languages supported
+* Captcha supported
+* Shortcodes available
+* Private/Public for Question and Answer
+* Ability to Follow Questions / Answers
+* Featured (Sticky) Question
+* Closed questions
+* Flag/report questions and answers to moderator
+* Basic user profile
+* BuddyPress integration
+* More to come...
+
+**Free Add-ons:**
+
+* Reputations
+* Tags
+* Categories
+* Bad words filter
+* Email notifications
+* reCaptcha
+* Dynamic text avatar
+
+AnsPress is frequently updated and more features are added based on feedback from our users. This means you are welcome to give us feedback and suggestions as to what you would like to see or need in the plugin. Visit our Github project https://github.com/anspress/anspress  or visit our community https://anspress.io/questions/  to get the updates.
 
 
 **Page Shortcodes**
@@ -88,6 +96,290 @@ Read full FAQ here https://anspress.io/docs/?topic=faq
 
 
 == Changelog ==
+
+= 4.0.4 =
+
+  * Do not create base pages automatically unless user wants
+  * Fixed: Illegal string offset error
+  * Added options for user page titles
+  * Make user pages slug editable
+  * Fixed missing assets
+  * Fixed: AnsPress JS is missing from home
+  * Fixed translation
+  * Fixed wrong text domain in category template
+  * Updated po and mo
+
+= 4.0.3 =
+
+ * Improved updater
+ * Fixed: fatal error while deleting a question
+
+= 4.0.2 =
+
+ * Minor fixes
+
+= 4.0.1 =
+
+ * Minor fixes
+
+= 4.0.0 =
+
+** Beta 4 **
+
+* Fixed bugs in files
+* Fixed buddypress.php bugs
+* Fixed avatar.php issues
+* Fixed: Author is not able to view their own private posts
+* Fixed fatal error
+* Allow user page callback without class
+* Show WP_Error message for comments in snackbar
+* Fixed: unable to submit form when duplicate check is disabled
+* Fixed: duplicate post error snackbar message not showing
+* Improved user page title
+* Fixed php notice
+* Fixed menu
+* fixed warning
+* Added option to disable duplicate check
+* Do not insert qameta if post is not question or answer
+* Fixed trash question
+* Added misisng assets in wp-admin
+* Fixed parent_q warning
+* Fixed typo
+* Added notification table in uninstaller
+* Fixed reputation migrator
+* Deactivate old AnsPress extensions
+* Disable old AnsPress extensions while initializing AnsPress
+* Improved migrator
+* Add 302 status in shortlink redirect
+* Fixed shrotlink in reputation
+* Check ap_meta table exists while migrating
+* Do not insert reputations, notifications and prevent sending emails while updating
+* Added filter to modify tag question query
+* Added user answers page
+* Load comments by default
+* Fixed JS template not loading properly
+* Prevent question query to use SQL_CALC_FOUND_ROWS which is relatively slow in big site
+* Added support for polylang
+* Fixed short link
+* Improved notification dropdown toggle
+* Improved notification dropdown menu
+* Added notification dropdown
+* Improved user menu
+* Improved anspress pages, menu and slugs
+* Improved user menu
+* User profile as an addon
+* Added load more button in notification
+* Improved notification sorting
+* Added notification count and mark all notification read button
+* Improved notification ref prefetch
+* Improved notification query
+* Improved best answer notification
+* Improved notification flush on post delete
+* Delete corresponding notification when a post gets deleted
+* Notify user on comment
+* Notification for best answer
+* Reload reCaptcha after form submission
+* Fixed: while editing anonymous user's post author changes
+* FIXED: wrong classes for columns in tags and categories
+* Fixed tags pagination
+* Added recaptcha methods
+* Added notifications addon
+* Added base query class
+* Fixed addons loading
+* Improved addons functions
+* Added add-on activation hook
+* CREATE TABLE IF NOT EXISTS to CREATE TABLE
+* Fixed reputation template file location
+* Improved category style
+* Fixed: strpos(): Offset not contained in string
+* Fixed: x-index of snackbar
+* Improved category icon
+* Store reputation in meta for sorting purpose
+* Removed debug code
+* Fixed: AP_Roles::remove_roles() should not be called statically
+* Added improved version of dynamic avatar addon
+* Fixed: private check box not working in form
+
+** Beta 3 **
+
+* Normalize addons path
+* Added subscribe button
+* Check if user can access post before sending email
+* Fixed: PHP Fatal error:  Uncaught Error: Call to undefined function ap_delete_subscriptions
+* Fixed: Question border not being highlighted
+* Removing codeception tests as PHPUnit test will be written from scratch
+* Improved email notification and subscribers
+* Added email queues and content table
+* Added subscription CRUD
+* Fix Categories can’t remove icon or add a new one
+* When using BuddyPress Add in the links to answers and reps don’t work.
+* Fixed MySql datatype of qameta views and flags to store large numbers
+* Fixed: illegal string offset date
+* Fixed attachment delete
+* Fixed delete uploads
+* Renamed author page to user page
+* Update term ids
+* Improved list layout
+* Include missing template files
+* Rename base.php and content-list.php to question-list.php and question-list-item.php
+* Fixed: non-logged in user seeing moderate answer
+* Removed dynamic avatar addon
+* Migrate category meta
+* Fixed static method warning
+* Fixed best answer migrate bug
+* Do not show upgrade message to new installs
+
+** Beta 2 **
+
+* Improved upgrader script
+* Added post activity migrator
+* Restore dates of question/answer after migration
+* Added best answers migrator
+* Added reputation migrator
+* Added answers count migrator
+* Added vote migration
+* Added migration helper
+* Fixed reputation prefetching
+* Added reputation page in BuddyPress
+* Fixed category addon
+* Added reputation load more button
+* Fixed: category icon and color setting not saving
+* Improved reputations
+* Improved DB table creation
+* Fixed: headers already sent error on saving options
+* Improved authors page
+* Added question permalink options
+* Fixed: clicking on answer order tab scroll to top
+* Fixed: uploaded media are not cleared after form submission
+* Removed repetitive words from login signup
+* Fixed upload progress bar
+* Fixed grunt tasks to add missing files
+* Fixed wrong class name in hook
+* Fixed comment warnings
+* Fixed typo in qameta column name
+* Fixed wrong user capability check
+* Fixed terms
+* Added about action link
+* Improve about
+* Removed unused images
+* Added about page
+* BuddyPress notification fixes
+* Improved buddyPress question and answer page template
+* Improved buddypress answer page
+* Improved answer link
+* Optimized reputation pre fetch
+* Improved reputation
+* Award reputation for comments
+* Added reputation addon
+* Fixed addon dir search
+* Improved email addon
+* Added email addons
+* Added tags extension as addon
+* Added category extension as an addon
+* Added bad words
+* Improved recaptcha
+* Unselect best answer when its get deleted
+* Removed broken widgets
+* Improved breadcrumbs
+* Delete votes when corresponding votes get deleted
+* Improved login/signup template
+* Improved addons
+* Improved addons and options
+* Added addons
+* Improved uninstaller
+* Added uninstall data tool
+* Show notice when option gets updated
+* Improved option form
+* Added author page
+* Renamed theme folder to templates
+* Improved search form and widget
+* Improved filter search
+* Improved list filter
+* Improved list style
+* Fixed warning in ask question submission
+* Check if user can read comment before fetching via ajax
+* Improved comment link
+* Before improving comments
+* Improved comment edit
+* Improved comments
+* Improved comment form
+* Improved comments listing
+* Fixed attachment display
+* Fixed permanent delete action
+* Improved delete and restore actions
+* Improved toggle featured action button
+* Improved actions and post staus view
+* Improved answer permalink
+* Improved edit answer page
+* Improved question edit page
+* Improved close action and select button
+* Improved select answer button and post actions
+* Delete temporary media using wp_cron
+* Finalizing uploader
+* Improved uploader
+* Improved ask form and vote bug
+* Organized assets
+* Remove plupload files after uploading files
+* Improved uploader
+* Improved Backbone collection and view
+* Replaced LESS with SCSS
+* Improved answer form
+* Improved answer form
+* Added snackbar
+* Adding backbone.js
+* Fixed errors in flag.php
+* Fixed votes.php errors
+* Removed ap_meta table and functions
+* Do not store views to ap_views table by default
+* Added views table
+* Fixed vote and clear flag button in wp-admin
+* Removed buddypress hooks
+* Added vue.js and answer list in question edit.
+* Improved post table
+* Improved admin
+* Improved option page
+* Removed user profile and mentions
+* Removed reputation and follow
+* Improved query by status
+* Removed subscription feature
+* Permission check in close question
+* Added close button
+* Moved status above question
+* Closed is not post_status anymore
+* Removed activity and notification
+* Remove activities page
+* Fixed error in admin
+* Removed activities
+* Improved question activities
+* Improved avatar for anonymous user
+* Improved avatar generation
+* Dynamically generate user avatar
+* Added misisng attach table in qameta
+* Fixed db error while creating ap_qameta table
+* Fixed activity in list
+* Releasing 4.0.0-alpha.1
+* Fix wpcs reporting
+* Fixed errors in qaquery
+* Pre cache users
+* Delete qameta row when post get deleted
+* Improved caching
+* Improved attachment cache
+* Pre fetch votes
+* Improved set featured question
+* Improved vote counts
+* improved voting
+* Improved terms query
+* reduced more queries
+* Improving query
+* Removed more post metas
+* Removed flags post meta
+* Replaced get_post to ap_get_post
+* Improved select answer
+* Replaced vote post meta
+* Improved query filter
+* Replaced deprecated functions
+* Removed many unused functions
+* Added qameta table
 
 = 3.0.7 =
 

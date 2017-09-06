@@ -13,9 +13,9 @@ $image_error_flag = 0;
 if ( $ap_settings['captcha_settings'] == '1' ) {
 	$captcha_type = isset( $ap_settings['captcha_type'] ) ? $ap_settings['captcha_type'] : 'math';
 	if ( $captcha_type == 'math' ) {
-		$number1 = sanitize_text_field( $_POST['ap_num1'] );
-		$number2 = sanitize_text_field( $_POST['ap_num2'] );
-		$result = sanitize_text_field( $_POST['ap_captcha_result'] );
+		$number1 = intval(sanitize_text_field( $_POST['ap_num1'] ));
+		$number2 = intval(sanitize_text_field( $_POST['ap_num2'] ));
+		$result = intval(sanitize_text_field( $_POST['ap_captcha_result'] ));
 		$actual_sum = $number1 + $number2;
 		if ( $actual_sum != $result ) {
 			$error_flag = 1;

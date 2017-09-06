@@ -19,10 +19,11 @@
  */
 function xmag_custom_header_setup() {
 	$header_image_height = get_theme_mod( 'xmag_header_image_height', 360 );
+	$header_image_width = get_theme_mod( 'xmag_header_image_width', 1920 );
 	add_theme_support( 'custom-header', apply_filters( 'xmag_custom_header_args', array(
 		'default-image'          => '',
 		'default-text-color'     => '000000',
-		'width'                  => 1920,
+		'width'                  => $header_image_width,
 		'height'                 => $header_image_height,
 		'flex-height'            => false,
 		'wp-head-callback'       => 'xmag_header_style',

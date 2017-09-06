@@ -1,7 +1,7 @@
 <?php
 /**
  * AnsPress product license *
- * Handle licences of AnsPress products.
+ * Handle licence of AnsPress products.
  *
  * @link https://anspress.io
  * @since 2.4.5
@@ -9,12 +9,19 @@
  * @package AnsPress/AP_License
  */
 
-if ( ! class_exists( 'EDD_SL_Plugin_Updater' ) ) {
-	// Load updater.
-	include( dirname( __FILE__ ) . '/updater.php' );
-}
 
-class AP_License{
+// Load updater.
+require_once( dirname( __FILE__ ) . '/updater.php' );
+
+
+/**
+ * AnsPress license
+ */
+class AP_License {
+
+	/**
+	 * Initialize class.
+	 */
 	public function __construct() {
 		add_action( 'ap_admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_init', array( $this, 'ap_plugin_updater' ), 0 );
@@ -26,8 +33,8 @@ class AP_License{
 	public function menu() {
 		$fields = ap_product_license_fields();
 		if ( ! empty( $fields ) ) {
-			$count = ' <span class="update-plugins count"><span class="plugin-count">'.number_format_i18n( count($fields ) ).'</span></span>';
-			add_submenu_page( 'anspress', __( 'Licenses', 'anspress-question-answer' ), __( 'Licenses', 'anspress-question-answer' ).$count, 'manage_options', 'anspress_licenses', array( $this, 'display_plugin_licenses' ) );
+			$count = ' <span class="update-plugins count"><span class="plugin-count">' . number_format_i18n( count( $fields ) ) . '</span></span>';
+			add_submenu_page( 'anspress', __( 'Licenses', 'anspress-question-answer' ), __( 'Licenses', 'anspress-question-answer' ) . $count, 'manage_options', 'anspress_licenses', array( $this, 'display_plugin_licenses' ) );
 		}
 	}
 
@@ -38,27 +45,30 @@ class AP_License{
 		include_once( 'views/licenses.php' );
 	}
 
+	/**
+	 * AnsPress license form.
+	 */
 	public static function ap_product_license() {
-
-		if ( ! current_user_can( 'manage_options' ) || ! wp_verify_nonce( $_POST['ap_licenses_nonce'], 'ap_licenses_nonce' ) ) {
+		if ( ! current_user_can( 'manage_options' ) || ! ap_verify_nonce( 'ap_licenses_nonce' ) ) {
 			return;
 		}
 
 		$licenses = get_option( 'anspress_license', array() );
 		$fields = ap_product_license_fields();
 
-		if ( empty($fields ) ) {
+		if ( empty( $fields ) ) {
 			return;
 		}
 
-		if ( isset( $_POST['save_licenses'] ) ) {
-			foreach ( $fields as $slug => $prod ) {
-				if ( isset( $_POST['ap_license_'.$slug] ) && $licenses[$slug]['key'] != sanitize_text_field( $_POST['ap_license_'.$slug] ) ) {
-
-					$licenses[$slug] = array(
-						'key' => trim(sanitize_text_field( wp_unslash( $_POST['ap_license_'.$slug] ) ) ),
+		if ( ap_isset_post_value( 'save_licenses' ) ) {
+			foreach ( (array) $fields as $slug => $prod ) {
+				$prod_license = ap_isset_post_value( 'ap_license_' . $slug, '' );
+				if ( ! empty( $prod_license ) && ! isset( $licenses[ $slug ] ) || $prod_license !== $licenses[ $slug ]['key'] ) {
+					$licenses[ $slug ] = array(
+						'key'    => trim( ap_sanitize_unslash( 'ap_license_' . $slug, 'g', '' ) ),
 						'status' => false,
 					);
+
 					update_option( 'anspress_license', $licenses );
 				}
 			}
@@ -68,14 +78,14 @@ class AP_License{
 
 			// Data to send in our API request.
 			$api_params = array(
-				'license' 	=> $licenses[$slug]['key'],
-				'item_name' => urlencode( $prod['name'] ),
+				'license' 	=> $licenses[ $slug ]['key'],
+				'item_name' => rawurlencode( $prod['name'] ),
 				'url'       => home_url(),
+				'anspress_ver' => AP_VERSION,
 			);
 
 			// Check if activate is clicked.
-			if ( isset( $_POST['ap_license_activate_'.$slug] ) ) {
-
+			if ( ap_isset_post_value( 'ap_license_activate_' . $slug ) ) {
 				$api_params['edd_action'] = 'activate_license';
 
 				// Call the custom API.
@@ -86,13 +96,13 @@ class AP_License{
 					// Decode the license data.
 					$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 
-					$licenses[$slug]['status'] = sanitize_text_field( $license_data->license );
+					$licenses[ $slug ]['status'] = sanitize_text_field( $license_data->license );
 					update_option( 'anspress_license', $licenses );
 				}
 			}
 
 			// Check if deactivate is clicked.
-			if ( isset( $_POST['ap_license_deactivate_'.$slug] ) ) {
+			if ( ap_isset_post_value( 'ap_license_deactivate_' . $slug ) ) {
 				$api_params['edd_action'] = 'deactivate_license';
 
 				// Call the custom API.
@@ -102,7 +112,7 @@ class AP_License{
 				if ( ! is_wp_error( $response ) ) {
 					// Decode the license data.
 					$license_data = json_decode( wp_remote_retrieve_body( $response ) );
-					$licenses[$slug]['status'] = sanitize_text_field( $license_data->license );
+					$licenses[ $slug ]['status'] = sanitize_text_field( $license_data->license );
 					update_option( 'anspress_license', $licenses );
 				}
 			}
@@ -116,15 +126,17 @@ class AP_License{
 		$fields = ap_product_license_fields();
 		$licenses = get_option( 'anspress_license', array() );
 
-		if ( ! empty($fields ) ) {
+		if ( ! empty( $fields ) ) {
 			foreach ( $fields as $slug => $prod ) {
-				if ( isset( $licenses[ $slug ] ) && ! empty($licenses[ $slug ]['key'] ) ) {
-					new EDD_SL_Plugin_Updater( 'https://anspress.io', $prod['file'], array(
-							'version' 	=> ! empty( $prod['version'] ) ? $prod['version'] : '',
+				if ( isset( $licenses[ $slug ] ) && ! empty( $licenses[ $slug ]['key'] ) ) {
+					new AnsPress_Prod_Updater( $prod['file'], array(
+							'version' 	=> ! empty( $prod['version'] ) ? $prod['version']: '',
 							'license' 	=> $licenses[ $slug ]['key'],
-							'item_name' => ! empty( $prod['name'] ) ? $prod['name'] : '',
-							'author' 	=> ! empty($prod['author'] ) ? $prod['author'] : '',
-						)
+							'item_name' => ! empty( $prod['name'] ) ? $prod['name']:       '',
+							'author' 	  => ! empty( $prod['author'] ) ? $prod['author']:   '',
+							'slug' 	    => $slug,
+						),
+						isset( $prod['is_plugin'] ) ? $prod['is_plugin'] : true
 					);
 				}
 			}
@@ -134,7 +146,8 @@ class AP_License{
 }
 
 /**
- * AnsPress product licenses
+ * AnsPress product licenses.
+ *
  * @return array
  * @since 2.4.5
  */
